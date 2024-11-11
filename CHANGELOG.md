@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.7.0]
+
+- Released @ 11/2024 (UTC)
+- breaking: Add Option and Result classes inspired by Rust, refactor
+
 ## [0.6.2]
 
 - Released @ 10/2024 (UTC)

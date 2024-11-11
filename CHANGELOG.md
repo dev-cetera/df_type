@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.7.2]
+
+- Released @ 11/2024 (UTC)
+- fix: Address Dart formatter issues
+
 ## [0.7.1]
 
 - Released @ 11/2024 (UTC)

@@ -79,7 +79,9 @@ sealed class Result<T, E> {
   /// If it's [Ok], apply the function to the value; otherwise, return the
   /// original [Result].
   Result<U, E> mapOrElse<U>(
-      U Function(T value) onOk, U Function(E error) onErr,) {
+    U Function(T value) onOk,
+    U Function(E error) onErr,
+  ) {
     if (this is Ok<T, E>) {
       return Ok(onOk((this as Ok<T, E>).value));
     }

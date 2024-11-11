@@ -14,9 +14,13 @@ import 'dart:async';
 
 // ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
 
-abstract final class StreamUtils {
+final class StreamUtility {
+  const StreamUtility._();
+
+  static final i = const StreamUtility._();
+
   /// Waits for the first value from the [Stream] and returns it as a [Future].
-  static Future<T> firstToFuture<T>(Stream<T> stream) {
+  Future<T> firstToFuture<T>(Stream<T> stream) {
     final completer = Completer<T>();
     StreamSubscription<T>? subscription;
 
@@ -49,7 +53,7 @@ abstract final class StreamUtils {
   }
 
   /// Creates a [Stream] that polls a [callback] at a specified [interval].
-  static Stream<T> newPoller<T>(
+  Stream<T> newPoller<T>(
     Future<T> Function() callback,
     Duration interval,
   ) {

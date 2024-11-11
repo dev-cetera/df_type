@@ -10,9 +10,13 @@
 // ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
 //.title~
 
-abstract final class DateTimeUtils {
+final class DateTimeUtility {
+  const DateTimeUtility._();
+
+  static final i = const DateTimeUtility._();
+
   /// Returns the last date in the list of dates, ignoring null values.
-  static DateTime? last(Iterable<DateTime?>? dates) {
+  DateTime? last(Iterable<DateTime?>? dates) {
     if (dates == null) return null;
     final filteredDates = dates.whereType<DateTime>();
     if (filteredDates.isEmpty) return null;
@@ -20,7 +24,7 @@ abstract final class DateTimeUtils {
   }
 
   /// Returns the first date in the list of dates, ignoring null values.
-  static DateTime? first(Iterable<DateTime?>? dates) {
+  DateTime? first(Iterable<DateTime?>? dates) {
     if (dates == null) return null;
     final filteredDates = dates.whereType<DateTime>();
     if (filteredDates.isEmpty) return null;
@@ -28,7 +32,7 @@ abstract final class DateTimeUtils {
   }
 
   /// Returns the average date in the list of dates, ignoring null values.
-  static DateTime? avg(Iterable<DateTime?>? dates) {
+  DateTime? avg(Iterable<DateTime?>? dates) {
     if (dates == null) return null;
     final filteredDates = dates.whereType<DateTime>();
     if (filteredDates.isEmpty) return null;
@@ -41,7 +45,7 @@ abstract final class DateTimeUtils {
   }
 
   /// Returns the median date in the list of dates, ignoring null values.
-  static DateTime? median(Iterable<DateTime?>? dates) {
+  DateTime? median(Iterable<DateTime?>? dates) {
     if (dates == null) return null;
     final filteredDates = dates.whereType<DateTime>().toList()..sort();
     if (filteredDates.isEmpty) return null;

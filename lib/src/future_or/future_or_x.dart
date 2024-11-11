@@ -16,7 +16,7 @@ import 'consec.dart';
 
 // ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
 
-extension FutureOrExtension<T extends Object> on FutureOr<T> {
+extension FutureOrX<T extends Object> on FutureOr<T> {
   /// Maps a synchronous or asynchronous value to another.
   FutureOr<R> thenOr<R extends Object?>(
     TSyncOrAsyncMapper<T, R> callback, {

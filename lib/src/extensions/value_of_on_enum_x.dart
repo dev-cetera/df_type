@@ -14,7 +14,7 @@ import 'package:collection/collection.dart';
 
 // ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
 
-extension ValueOfOnEnumExtension<T extends Enum> on Iterable<T> {
+extension ValueOfOnEnumX<T extends Enum> on Iterable<T> {
   /// Returns the first element or `null` if there are none.
   ///
   /// **Example:**

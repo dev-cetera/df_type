@@ -10,7 +10,7 @@
 // ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
 //.title~
 
-extension TryOrNullOnFunctionExtension on Function {
+extension TryOrNullOnFunctionX on Function {
   T? tryOrNull<T>(
     List<dynamic>? positionalArguments, [
     Map<Symbol, dynamic>? namedArguments,

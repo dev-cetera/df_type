@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.7.3]
+
+- Released @ 11/2024 (UTC)
+- feat: Add methods to Result and Option
+
 ## [0.7.2]
 
 - Released @ 11/2024 (UTC)

@@ -104,7 +104,7 @@ sealed class Option<T> {
   @override
   int get hashCode => fold(
         (value) => value.hashCode,
-        () => 0,
+        () => null.hashCode,
       );
 }
 

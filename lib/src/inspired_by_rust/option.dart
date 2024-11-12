@@ -16,13 +16,26 @@ sealed class Option<T> {
   bool get isSome => this is Some<T>;
   bool get isNone => this is None<T>;
 
-  /// Unwrap the value or throw an error if it's [None].
-  T unwrap() {
-    return fold(
-      (value) => value,
-      () => throw Exception('Attempted to unwrap None'),
-    );
+  /// Get the [Some] value or throw an error if it's [None].
+  Some<T> get some {
+    try {
+      return this as Some<T>;
+    } catch (e) {
+      throw Exception('Attempted to get Some from None: $e');
+    }
   }
+
+  /// Get the [None] value or throw an error if it's [Some].
+  None<T> get none {
+    try {
+      return this as None<T>;
+    } catch (e) {
+      throw Exception('Attempted to get None from Some: $e');
+    }
+  }
+
+  /// Unwrap the value or throw an error if it's [None].
+  T unwrap() => some.value;
 
   /// Fold is used to handle both Some and [None] cases.
   T fold(T Function(T value) onSome, T Function() onNone);

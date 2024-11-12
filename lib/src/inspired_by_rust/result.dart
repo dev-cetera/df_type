@@ -20,12 +20,27 @@ sealed class Result<T, E> {
   bool get isOk => this is Ok<T, E>;
   bool get isErr => this is Err<T, E>;
 
+  /// Get the [Ok] value or throw an error if it's [Err].
+  Ok<T, E> get ok {
+    try {
+      return this as Ok<T, E>;
+    } catch (e) {
+      throw Exception('Attempted to get Ok from Err: $e');
+    }
+  }
+
+  /// Get the [Err] value or throw an error if it's [Ok].
+  Err<T, E> get err {
+    try {
+      return this as Err<T, E>;
+    } catch (e) {
+      throw Exception('Attempted to get Err from Ok: $e');
+    }
+  }
+
   /// Unwrap the value or throw an error if it's [Err].
   T unwrap() {
-    return fold(
-      (value) => value,
-      (err) => throw Exception('Attempted to unwrap Err: $err'),
-    );
+    return ok.value;
   }
 
   /// Fold is used to handle both [Ok] and [Err] cases.

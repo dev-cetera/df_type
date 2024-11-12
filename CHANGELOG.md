@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.7.4]
+
+- Released @ 11/2024 (UTC)
+- fix: Fix issues with Option and Result
+
 ## [0.7.3]
 
 - Released @ 11/2024 (UTC)

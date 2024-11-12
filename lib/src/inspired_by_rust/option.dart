@@ -38,7 +38,7 @@ sealed class Option<T> {
   T unwrap() => some.value;
 
   /// Fold is used to handle both Some and [None] cases.
-  T fold(T Function(T value) onSome, T Function() onNone);
+  B fold<B>(B Function(T value) onSome, B Function() onNone);
 
   /// Maps the value inside [Some] if it exists.
   Option<U> map<U>(U Function(T value) fn) {
@@ -92,6 +92,20 @@ sealed class Option<T> {
     }
     return None<U>();
   }
+
+  @override
+  bool operator ==(Object other) {
+    return this.fold(
+      (value) => other is Some && value == other.value,
+      () => other is None && none == other.none,
+    );
+  }
+
+  @override
+  int get hashCode => fold(
+        (value) => value.hashCode,
+        () => 0,
+      );
 }
 
 // ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
@@ -102,7 +116,7 @@ final class Some<T> extends Option<T> {
   const Some(this.value);
 
   @override
-  T fold(T Function(T value) onSome, T Function() onNone) => onSome(value);
+  B fold<B>(B Function(T value) onSome, B Function() onNone) => onSome(value);
 }
 
 // ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
@@ -112,5 +126,5 @@ final class None<T> extends Option<T> {
   const None();
 
   @override
-  T fold(T Function(T value) onSome, T Function() onNone) => onNone();
+  B fold<B>(B Function(T value) onSome, B Function() onNone) => onNone();
 }

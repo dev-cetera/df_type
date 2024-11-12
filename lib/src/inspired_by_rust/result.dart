@@ -44,7 +44,7 @@ sealed class Result<T, E> {
   }
 
   /// Fold is used to handle both [Ok] and [Err] cases.
-  T fold(T Function(T value) onOk, T Function(E error) onErr);
+  B fold<B>(B Function(T value) onOk, B Function(E error) onErr);
 
   /// Convert to [Option], where [Ok] becomes [Some] and [Err] becomes [None].
   Option<T> toOption() => isOk ? Some((this as Ok<T, E>).value) : const None();
@@ -121,6 +121,20 @@ sealed class Result<T, E> {
     return false;
   }
 
+  @override
+  bool operator ==(Object other) {
+    return this.fold(
+      (value) => other is Ok && value == other.value,
+      (error) => other is Err && error == other.error,
+    );
+  }
+
+  @override
+  int get hashCode => fold(
+        (value) => value.hashCode,
+        (error) => error.hashCode,
+      );
+
   /// Constructs a new [Result] from a function that might throw.
   static Result<T, E> tryCatch<T, E, X extends Object>(
     T Function() fn,
@@ -151,7 +165,7 @@ final class Ok<T, E> extends Result<T, E> {
   const Ok(this.value);
 
   @override
-  T fold(T Function(T value) onOk, T Function(E error) onErr) => onOk(value);
+  B fold<B>(B Function(T value) onOk, B Function(E error) onErr) => onOk(value);
 }
 
 // ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
@@ -162,5 +176,5 @@ final class Err<T, E> extends Result<T, E> {
   const Err(this.error);
 
   @override
-  T fold(T Function(T value) onOk, T Function(E error) onErr) => onErr(error);
+  B fold<B>(B Function(T value) onOk, B Function(E error) onErr) => onErr(error);
 }

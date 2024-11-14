@@ -192,5 +192,6 @@ final class Err<T, E> extends Result<T, E> {
   const Err(this.error);
 
   @override
-  B fold<B>(B Function(T value) onOk, B Function(E error) onErr) => onErr(error);
+  B fold<B>(B Function(T value) onOk, B Function(E error) onErr) =>
+      onErr(error);
 }

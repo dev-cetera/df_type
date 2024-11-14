@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.7.5]
+
+- Released @ 11/2024 (UTC)
+- feat: Add some Future support for Result
+
 ## [0.7.4]
 
 - Released @ 11/2024 (UTC)

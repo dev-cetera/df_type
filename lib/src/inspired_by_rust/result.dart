@@ -57,6 +57,19 @@ sealed class Result<T, E> {
     return this as Result<U, E>;
   }
 
+  /// Maps the value inside [Ok] asynchronously, keeping [Err] unchanged.
+  Future<Result<U, E>> mapAsync<U>(Future<U> Function(T value) fn) async {
+    if (this is Ok<T, E>) {
+      try {
+        final result = await fn((this as Ok<T, E>).value);
+        return Ok(result);
+      } catch (e) {
+        return Err(e as E); // Cast carefully or handle the type properly.
+      }
+    }
+    return this as Result<U, E>;
+  }
+
   /// Maps the error inside [Err] if it exists, keeping [Ok] unchanged.
   Result<T, F> mapErr<F>(F Function(E error) fn) {
     if (this is Err<T, E>) {
@@ -136,23 +149,26 @@ sealed class Result<T, E> {
       );
 
   /// Constructs a new [Result] from a function that might throw.
-  static Result<T, E> tryCatch<T, E, X extends Object>(
+  static Result<T, E> tryCatch<T, E, F extends Object>(
     T Function() fn,
-    E Function(X e) onError,
+    E Function(F e) onError,
   ) {
     try {
       return Ok(fn());
-    } on X catch (e) {
+    } on F catch (e) {
       return Err(onError(e));
     }
   }
 
   /// Constructs a new [Result] from a function that might throw.
-  static Result<R, X> tryExcept<X extends Object, R>(R Function() fn) {
+  static Future<Result<T, E>> tryCatchAsync<T, E>(
+    Future<T> Function() fn,
+    E Function(Object error) onError,
+  ) async {
     try {
-      return Ok(fn());
-    } on X catch (e) {
-      return Err(e);
+      return Ok(await fn());
+    } catch (e) {
+      return Err(onError(e));
     }
   }
 }
@@ -176,6 +192,5 @@ final class Err<T, E> extends Result<T, E> {
   const Err(this.error);
 
   @override
-  B fold<B>(B Function(T value) onOk, B Function(E error) onErr) =>
-      onErr(error);
+  B fold<B>(B Function(T value) onOk, B Function(E error) onErr) => onErr(error);
 }

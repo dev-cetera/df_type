@@ -12,7 +12,7 @@
 
 name: df_type
 description: A package designed to simplify and enhance interactions with Dart types.
-version: 0.7.4
+version: 0.7.5
 repository: https://github.com/DevCetra/df_type
 funding:
   - https://www.buymeacoffee.com/robmllze

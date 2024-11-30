@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.7.6]
+
+- Released @ 11/2024 (UTC)
+- fix: Fix bug in StreamUtility.newPoller
+
 ## [0.7.5]
 
 - Released @ 11/2024 (UTC)

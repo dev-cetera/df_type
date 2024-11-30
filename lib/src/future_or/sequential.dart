@@ -159,7 +159,8 @@ class ExecutionQueue {
                   .first,
     );
     _queue.add(executable);
-    final result = mapSyncOrAsync(_execute(), (_) => executable.completer.futureOr);
+    final result =
+        mapSyncOrAsync(_execute(), (_) => executable.completer.futureOr);
     return result;
   }
 

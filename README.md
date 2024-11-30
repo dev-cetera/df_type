@@ -103,30 +103,30 @@ void main() async {
   final c2 = completer2.futureOr;
   print(c2 is Future); // true
 
-  // The ExecutionQueue guarantees that functions will execute in the same
+  // The Sequentual guarantees that functions will execute in the same
   // order as they are added:
   print('\n*** Test function queue:\n');
-  final executionQueue = ExecutionQueue();
-  executionQueue.add((prev) async {
+  final sequential = Sequentual();
+  sequential.add((prev) async {
     print('Previous: $prev');
     print('Function 1 running');
     await Future<void>.delayed(const Duration(seconds: 3));
     print('Function 1 completed');
     return 1;
   });
-  executionQueue.add((prev) async {
+  sequential.add((prev) async {
     print('Previous: $prev');
     await Future<void>.delayed(const Duration(seconds: 2));
     print('Function 2 completed');
     return 2;
   });
-  executionQueue.add((prev) async {
+  sequential.add((prev) async {
     print('Previous: $prev');
     await Future<void>.delayed(const Duration(seconds: 1));
     print('Function 3 completed');
     return 3;
   });
-  await executionQueue.add((prev) async {
+  await sequential.add((prev) async {
     print('Previous: $prev');
     await Future<void>.delayed(const Duration(seconds: 1));
     print('Function 3 completed');
@@ -138,8 +138,8 @@ void main() async {
   // Function 2 completed
   // Function 3 running
   // Function 3 completed
-  print(executionQueue.add((_) => 'Hello').runtimeType); // String
-  print(executionQueue.add((prev) => '$prev World!')); // Hello World!
+  print(sequential.add((_) => 'Hello').runtimeType); // String
+  print(sequential.add((prev) => '$prev World!')); // Hello World!
 }
 ```
 

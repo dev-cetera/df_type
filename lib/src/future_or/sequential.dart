@@ -96,6 +96,10 @@ class Sequential {
 
   /// Retrieves the last value in the queue without altering the queue.
   FutureOr<dynamic> get last => add<dynamic>((e) => e);
+
+  /// Indicates whether the last value in the queue is a [Future]. Use
+  /// [isEmpty] instead to check if the queue is empty.
+  bool get hasLast => last is Future;
 }
 
 // ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
@@ -155,8 +159,7 @@ class ExecutionQueue {
                   .first,
     );
     _queue.add(executable);
-    final result =
-        mapSyncOrAsync(_execute(), (_) => executable.completer.futureOr);
+    final result = mapSyncOrAsync(_execute(), (_) => executable.completer.futureOr);
     return result;
   }
 

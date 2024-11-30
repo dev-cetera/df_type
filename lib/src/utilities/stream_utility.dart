@@ -58,32 +58,24 @@ final class StreamUtility {
     Duration interval,
   ) {
     final controller = StreamController<T>.broadcast();
-    var started = false;
+    Timer? timer;
 
-    void startPolling() async {
-      started = true;
+    Future<void> poll() async {
       try {
-        while (!controller.isClosed) {
-          try {
-            final result = await callback();
-            controller.add(result);
-          } catch (e) {
-            controller.addError(e);
-          }
-          await Future<void>.delayed(interval);
-        }
+        final result = await callback();
+        controller.add(result);
       } catch (e) {
-        if (!controller.isClosed) {
-          controller.addError(e);
-          controller.close();
-        }
+        controller.addError(e);
       }
     }
 
     controller.onListen = () {
-      if (!started) {
-        startPolling();
-      }
+      timer = Timer.periodic(interval, (_) => poll());
+    };
+
+    controller.onCancel = () {
+      timer?.cancel();
+      controller.close();
     };
 
     return controller.stream;

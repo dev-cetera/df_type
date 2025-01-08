@@ -1,7 +1,7 @@
 //.title
 // ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
 //
-// Dart/Flutter (DF) Packages by DevCetra.com & contributors. The use of this
+// Dart/Flutter (DF) Packages by dev-cetera.com & contributors. The use of this
 // source code is governed by an MIT-style license described in the LICENSE
 // file located in this project's root directory.
 //
@@ -17,10 +17,14 @@ import 'option.dart';
 sealed class Result<T, E> {
   const Result();
 
+  @pragma('vm:prefer-inline')
   bool get isOk => this is Ok<T, E>;
+
+  @pragma('vm:prefer-inline')
   bool get isErr => this is Err<T, E>;
 
   /// Get the [Ok] value or throw an error if it's [Err].
+  @pragma('vm:prefer-inline')
   Ok<T, E> get ok {
     try {
       return this as Ok<T, E>;
@@ -30,6 +34,7 @@ sealed class Result<T, E> {
   }
 
   /// Get the [Err] value or throw an error if it's [Ok].
+  @pragma('vm:prefer-inline')
   Err<T, E> get err {
     try {
       return this as Err<T, E>;
@@ -39,17 +44,24 @@ sealed class Result<T, E> {
   }
 
   /// Unwrap the value or throw an error if it's [Err].
-  T unwrap() {
-    return ok.value;
-  }
+  @pragma('vm:prefer-inline')
+  T unwrap() => ok.value;
 
   /// Fold is used to handle both [Ok] and [Err] cases.
+  @pragma('vm:prefer-inline')
   B fold<B>(B Function(T value) onOk, B Function(E error) onErr);
 
   /// Convert to [Option], where [Ok] becomes [Some] and [Err] becomes [None].
-  Option<T> toOption() => isOk ? Some((this as Ok<T, E>).value) : const None();
+  @pragma('vm:prefer-inline')
+  Option<T> toOption() {
+    if (isOk) {
+      return Some((this as Ok<T, E>).value);
+    }
+    return const None();
+  }
 
   /// Maps the value inside [Ok] if it exists, keeping [Err] unchanged.
+  @pragma('vm:prefer-inline')
   Result<U, E> map<U>(U Function(T value) fn) {
     if (this is Ok<T, E>) {
       return Ok(fn((this as Ok<T, E>).value));
@@ -58,6 +70,7 @@ sealed class Result<T, E> {
   }
 
   /// Maps the value inside [Ok] asynchronously, keeping [Err] unchanged.
+  @pragma('vm:prefer-inline')
   Future<Result<U, E>> mapAsync<U>(Future<U> Function(T value) fn) async {
     if (this is Ok<T, E>) {
       try {
@@ -71,6 +84,7 @@ sealed class Result<T, E> {
   }
 
   /// Maps the error inside [Err] if it exists, keeping [Ok] unchanged.
+  @pragma('vm:prefer-inline')
   Result<T, F> mapErr<F>(F Function(E error) fn) {
     if (this is Err<T, E>) {
       return Err(fn((this as Err<T, E>).error));
@@ -80,6 +94,7 @@ sealed class Result<T, E> {
 
   /// Applies a function to the value inside [Ok] if it exists, otherwise
   /// returns [Err].
+  @pragma('vm:prefer-inline')
   Result<U, E> andThen<U>(Result<U, E> Function(T value) fn) {
     if (this is Ok<T, E>) {
       return fn((this as Ok<T, E>).value);
@@ -88,6 +103,7 @@ sealed class Result<T, E> {
   }
 
   /// If this [Result] is [Err], provides a default value (or another [Result]).
+  @pragma('vm:prefer-inline')
   Result<T, E> orElse(Result<T, E> Function() alternative) {
     if (this is Ok<T, E>) {
       return this;
@@ -97,6 +113,7 @@ sealed class Result<T, E> {
 
   /// If the [Result] is [Ok], provides a default value; otherwise, executes
   /// the error function.
+  @pragma('vm:prefer-inline')
   T getOrElse(T Function() defaultValue) {
     return fold(
       (value) => value,
@@ -106,6 +123,7 @@ sealed class Result<T, E> {
 
   /// If it's [Ok], apply the function to the value; otherwise, return the
   /// original [Result].
+  @pragma('vm:prefer-inline')
   Result<U, E> mapOrElse<U>(
     U Function(T value) onOk,
     U Function(E error) onErr,
@@ -117,6 +135,7 @@ sealed class Result<T, E> {
   }
 
   /// Check if [Result] is [Ok] and the value satisfies a predicate.
+  @pragma('vm:prefer-inline')
   bool isOkAnd(bool Function(T value) predicate) {
     if (this is Ok<T, E>) {
       final value = (this as Ok<T, E>).value;
@@ -126,6 +145,7 @@ sealed class Result<T, E> {
   }
 
   /// Check if [Result] is [Err] and the error satisfies a predicate.
+  @pragma('vm:prefer-inline')
   bool isErrAnd(bool Function(E error) predicate) {
     if (this is Err<T, E>) {
       final error = (this as Err<T, E>).error;
@@ -135,6 +155,7 @@ sealed class Result<T, E> {
   }
 
   @override
+  @pragma('vm:prefer-inline')
   bool operator ==(Object other) {
     return this.fold(
       (value) => other is Ok && value == other.value,
@@ -143,12 +164,14 @@ sealed class Result<T, E> {
   }
 
   @override
+  @pragma('vm:prefer-inline')
   int get hashCode => fold(
         (value) => value.hashCode,
         (error) => error.hashCode,
       );
 
   /// Constructs a new [Result] from a function that might throw.
+  @pragma('vm:prefer-inline')
   static Result<T, E> tryCatch<T, E, F extends Object>(
     T Function() fn,
     E Function(F e) onError,
@@ -161,6 +184,7 @@ sealed class Result<T, E> {
   }
 
   /// Constructs a new [Result] from a function that might throw.
+  @pragma('vm:prefer-inline')
   static Future<Result<T, E>> tryCatchAsync<T, E>(
     Future<T> Function() fn,
     E Function(Object error) onError,
@@ -181,6 +205,7 @@ final class Ok<T, E> extends Result<T, E> {
   const Ok(this.value);
 
   @override
+  @pragma('vm:prefer-inline')
   B fold<B>(B Function(T value) onOk, B Function(E error) onErr) => onOk(value);
 }
 
@@ -192,6 +217,6 @@ final class Err<T, E> extends Result<T, E> {
   const Err(this.error);
 
   @override
-  B fold<B>(B Function(T value) onOk, B Function(E error) onErr) =>
-      onErr(error);
+  @pragma('vm:prefer-inline')
+  B fold<B>(B Function(T value) onOk, B Function(E error) onErr) => onErr(error);
 }

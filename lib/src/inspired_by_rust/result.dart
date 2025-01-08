@@ -218,5 +218,6 @@ final class Err<T, E> extends Result<T, E> {
 
   @override
   @pragma('vm:prefer-inline')
-  B fold<B>(B Function(T value) onOk, B Function(E error) onErr) => onErr(error);
+  B fold<B>(B Function(T value) onOk, B Function(E error) onErr) =>
+      onErr(error);
 }

@@ -107,10 +107,10 @@ void main() async {
   final c2 = completer2.futureOr;
   print(c2 is Future); // true
 
-  // The Sequentual guarantees that functions will execute in the same
+  // The Sequential guarantees that functions will execute in the same
   // order as they are added:
   print('\n*** Test function queue:\n');
-  final sequential = Sequentual();
+  final sequential = Sequential();
   sequential.add((prev) async {
     print('Previous: $prev');
     print('Function 1 running');

@@ -22,5 +22,3 @@ export 'future_or/future_or_controller.dart';
 export 'future_or/consec.dart';
 export 'future_or/sequential.dart';
 export 'future_or/completer_or.dart';
-export 'inspired_by_rust/option.dart';
-export 'inspired_by_rust/result.dart';

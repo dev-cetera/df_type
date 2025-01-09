@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.8.0]
+
+- Released @ 9/2025 (UTC)
+- breaking: Removed some components and moved to df_safer_dart package
+
 ## [0.7.7]
 
 - Released @ 1/2025 (UTC)

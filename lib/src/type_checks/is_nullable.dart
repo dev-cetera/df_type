@@ -11,4 +11,5 @@
 //.title~
 
 /// Returns true if [T] is nullable.
+@pragma('vm:prefer-inline')
 bool isNullable<T>() => null is T;

@@ -18,9 +18,11 @@ import '_index.g.dart';
 
 /// Let's you cast [input] to a [T] type if possible, or returns `null` if the
 /// cast cannot be performed.
+@pragma('vm:prefer-inline')
 T? letAsOrNull<T>(dynamic input) => input is T ? input : null;
 
 /// Similar to [letAsOrNull], but uses a try-catch block internally.
+@pragma('vm:prefer-inline')
 T? castAsOrNull<T>(dynamic input) {
   try {
     return input as T;
@@ -81,15 +83,13 @@ num? letNumOrNull(dynamic input) {
 
 /// Let's you convert [input] to an [int] type if possible, or returns `null` if
 /// the conversion cannot be performed.
-int? letIntOrNull(dynamic input) {
-  return letNumOrNull(input)?.toInt();
-}
+@pragma('vm:prefer-inline')
+int? letIntOrNull(dynamic input) => letNumOrNull(input)?.toInt();
 
 /// Let's you convert [input] to a [double] type if possible, or returns `null` if
 /// the conversion cannot be performed.
-double? letDoubleOrNull(dynamic input) {
-  return letNumOrNull(input)?.toDouble();
-}
+@pragma('vm:prefer-inline')
+double? letDoubleOrNull(dynamic input) => letNumOrNull(input)?.toDouble();
 
 /// Let's you convert [input] to a [bool] type if possible, or returns `null` if
 /// the conversion cannot be performed.
@@ -144,8 +144,7 @@ Map<K, V>? letMapOrNull<K, V>(
       final temp = decoded.entries
           .map((entry) {
             final convertedKey = letOrNull<K>(entry.key);
-            final convertedValue =
-                letOrNull<V>(entry.value) ?? letOrNull<V?>(nullFallback);
+            final convertedValue = letOrNull<V>(entry.value) ?? letOrNull<V?>(nullFallback);
             if (filterNulls) {
               if (!isNullable<K>() && convertedKey == null) {
                 return const _Empty();

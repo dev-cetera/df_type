@@ -40,9 +40,8 @@ FutureOr<R> consecList<R>(
   }
 }
 
-final mapSyncOrAsync = consec;
-
 /// Maps a synchronous or asynchronous value to a single value.
+@pragma('vm:prefer-inline')
 FutureOr<R> consec<A, R>(
   FutureOr<A> a,
   FutureOr<R> Function(A a) callback, {
@@ -57,6 +56,7 @@ FutureOr<R> consec<A, R>(
 }
 
 /// Maps two synchronous or asynchronous values to a single value.
+@pragma('vm:prefer-inline')
 FutureOr<R> consec2<A, B, R>(
   FutureOr<A> a,
   FutureOr<B> b,
@@ -73,6 +73,7 @@ FutureOr<R> consec2<A, B, R>(
 }
 
 /// Maps three synchronous or asynchronous values to a single value.
+@pragma('vm:prefer-inline')
 FutureOr<R> consec3<A, B, C, R>(
   FutureOr<A> a,
   FutureOr<B> b,
@@ -91,6 +92,7 @@ FutureOr<R> consec3<A, B, C, R>(
 }
 
 /// Maps four synchronous or asynchronous values to a single value.
+@pragma('vm:prefer-inline')
 FutureOr<R> consec4<A, B, C, D, R>(
   FutureOr<A> a,
   FutureOr<B> b,
@@ -111,6 +113,7 @@ FutureOr<R> consec4<A, B, C, D, R>(
 }
 
 /// Maps five synchronous or asynchronous values to a single value.
+@pragma('vm:prefer-inline')
 FutureOr<R> consec5<A, B, C, D, E, R>(
   FutureOr<A> a,
   FutureOr<B> b,
@@ -133,6 +136,7 @@ FutureOr<R> consec5<A, B, C, D, E, R>(
 }
 
 /// Maps six synchronous or asynchronous values to a single value.
+@pragma('vm:prefer-inline')
 FutureOr<R> consec6<A, B, C, D, E, F, R>(
   FutureOr<A> a,
   FutureOr<B> b,
@@ -157,6 +161,7 @@ FutureOr<R> consec6<A, B, C, D, E, F, R>(
 }
 
 /// Maps seven synchronous or asynchronous values to a single value.
+@pragma('vm:prefer-inline')
 FutureOr<R> consec7<A, B, C, D, E, F, G, R>(
   FutureOr<A> a,
   FutureOr<B> b,
@@ -183,6 +188,7 @@ FutureOr<R> consec7<A, B, C, D, E, F, G, R>(
 }
 
 /// Maps eight synchronous or asynchronous values to a single value.
+@pragma('vm:prefer-inline')
 FutureOr<R> consec8<A, B, C, D, E, F, G, H, R>(
   FutureOr<A> a,
   FutureOr<B> b,
@@ -211,6 +217,7 @@ FutureOr<R> consec8<A, B, C, D, E, F, G, H, R>(
 }
 
 /// Maps nine synchronous or asynchronous values to a single value.
+@pragma('vm:prefer-inline')
 FutureOr<R> consec9<A, B, C, D, E, F, G, H, I, R>(
   FutureOr<A> a,
   FutureOr<B> b,

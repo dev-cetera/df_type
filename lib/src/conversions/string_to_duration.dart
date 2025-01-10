@@ -48,8 +48,7 @@ class ConvertStringToDuration {
         final secParts = parts[2].split('.');
         seconds = int.parse(secParts[0]);
         if (secParts.length > 1) {
-          milliseconds =
-              int.parse(secParts[1].padRight(3, '0').substring(0, 3));
+          milliseconds = int.parse(secParts[1].padRight(3, '0').substring(0, 3));
         }
       } else if (parts.length == 2) {
         // Format: HH:MM.
@@ -61,8 +60,7 @@ class ConvertStringToDuration {
         if (secParts.length > 1 || parts[0].contains('.')) {
           seconds = int.parse(secParts[0]);
           if (secParts.length > 1) {
-            milliseconds =
-                int.parse(secParts[1].padRight(3, '0').substring(0, 3));
+            milliseconds = int.parse(secParts[1].padRight(3, '0').substring(0, 3));
           }
         } else {
           hours = int.parse(parts[0]);
@@ -101,8 +99,7 @@ class ConvertStringToDuration {
 
 /// Exception thrown by [ConvertStringToDuration] when the input is null.
 final class _StringIsNullEx extends ConvertStringToDurationEx {
-  const _StringIsNullEx()
-      : super('Failed to convert string to duration: string is null.');
+  const _StringIsNullEx() : super('Failed to convert string to duration: string is null.');
 }
 
 /// Exception thrown by [ConvertStringToDuration] when the input string format is invalid.

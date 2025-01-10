@@ -78,8 +78,8 @@ class Sequential {
   /// Eenqueue a [function] without buffering.
   FutureOr<T> _enqueue<T>(FutureOr<T> Function(dynamic previous) function) {
     _isEmpty = false;
-    final temp = mapSyncOrAsync(
-      mapSyncOrAsync(
+    final temp = consec(
+      consec(
         _current,
         (previous) {
           return function(previous);
@@ -159,8 +159,7 @@ class ExecutionQueue {
                   .first,
     );
     _queue.add(executable);
-    final result =
-        mapSyncOrAsync(_execute(), (_) => executable.completer.futureOr);
+    final result = consec(_execute(), (_) => executable.completer.futureOr);
     return result;
   }
 
@@ -201,7 +200,7 @@ class ExecutionQueue {
         final result = executable.function(_previous);
 
         // Complete the function's execution based on its result type.
-        return mapSyncOrAsync(result, (dynamic value) {
+        return consec(result, (dynamic value) {
           _previous = value;
           executable.completer.complete(result);
           executable.status = _ExecutionStatus.RAN;

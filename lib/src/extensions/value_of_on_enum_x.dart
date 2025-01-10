@@ -24,6 +24,7 @@ extension ValueOfOnEnumX<T extends Enum> on Iterable<T> {
   /// final value = ExampleEnum.values.valueOf('b');
   /// print(ExampleEnum.b == value); // true
   /// ```
+  @pragma('vm:prefer-inline')
   T? valueOf(String? value) {
     return firstWhereOrNull(
       (type) => type.name.toLowerCase() == value?.toLowerCase(),

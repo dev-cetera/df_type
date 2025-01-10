@@ -11,4 +11,5 @@
 //.title~
 
 /// Returns true if [T1] and [T2] are the same type.
+@pragma('vm:prefer-inline')
 bool typeEquality<T1, T2>() => T1 == T2;

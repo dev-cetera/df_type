@@ -20,4 +20,5 @@
 /// print(isSubtype<int Function(int), Function>()); // true, int Function(int) is a Function
 /// print(isSubtype<Function, int Function(int)>()); // false, Function is not a int Function(int)
 /// ```
+@pragma('vm:prefer-inline')
 bool isSubtype<TChild, TParent>() => <TChild>[] is List<TParent>;

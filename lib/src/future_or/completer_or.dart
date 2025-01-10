@@ -53,14 +53,14 @@ class CompleterOr<T> {
   ///
   /// If the [CompleterOr] has been completed with a synchronous value, that
   /// value is returned directly. Otherwise, the [Future] is returned.
-  FutureOr<T> get futureOr {
-    return _value ?? _completer.future;
-  }
+  @pragma('vm:prefer-inline')
+  FutureOr<T> get futureOr => _value ?? _completer.future;
 
   /// Checks if the value has been set or if the [CompleterOr] is completed.
   ///
   /// This is `true` if either the synchronous value is set or the [CompleterOr]
   /// has been completed through [complete].  When `true`, [complete] should
   /// not be called again.
+  @pragma('vm:prefer-inline')
   bool get isCompleted => _completer.isCompleted || _value != null;
 }

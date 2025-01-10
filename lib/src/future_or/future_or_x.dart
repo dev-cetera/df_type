@@ -12,40 +12,32 @@
 
 import 'dart:async' show FutureOr;
 
+import 'package:df_safer_dart/df_safer_dart.dart';
+
 import 'consec.dart';
 
 // ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
 
 extension FutureOrX<T extends Object> on FutureOr<T> {
   /// Maps a synchronous or asynchronous value to another.
+  @pragma('vm:prefer-inline')
   FutureOr<R> thenOr<R extends Object?>(
     TSyncOrAsyncMapper<T, R> callback, {
     void Function(Object e)? onError,
   }) {
-    return mapSyncOrAsync<T, R>(
+    return consec<T, R>(
       this,
       callback,
       onError: onError,
     );
   }
 
-  /// Casts a value to a synchronous value or throws a [TypeError] if the value
-  /// is a [Future].
-  T get asSync {
-    try {
-      return asSyncOrNull!;
-    } catch (e) {
-      throw TypeError();
-    }
-  }
-
-  /// Casts a value to a synchronous value or returns `null` if the value is a
-  /// [Future].
-  T? get asSyncOrNull => this is T ? this as T : null;
+  /// Casts a value to a synchronous value.
+  @pragma('vm:prefer-inline')
+  Result<T> get asSync => this is T ? Ok(this as T) : const Err('Value is not synchronous.');
 
   /// Casts a value to a [Future] wrap the value in a [Future] if it is
   /// synchronous.
-  Future<T> get asAsync {
-    return this is Future<T> ? this as Future<T> : Future<T>.value(this);
-  }
+  @pragma('vm:prefer-inline')
+  Future<T> get asAsync => this is Future<T> ? this as Future<T> : Future<T>.value(this);
 }

@@ -36,37 +36,39 @@ class FutureOrController<T> {
   final _exceptions = <Object>[];
 
   /// Adds an exception to the list of tracked exceptions.
+  @pragma('vm:prefer-inline')
   void addException(Object e) => _exceptions.add(e);
 
   /// Returns a copy of the list of tracked exceptions.
+  @pragma('vm:prefer-inline')
   List<Object> get exceptions => List.unmodifiable(_exceptions);
 
   /// Adds a single callback to the controller.
-  void add(TSyncOrAsyncMapper<dynamic, T> callback) {
-    _callbacks.add(callback);
-  }
+  @pragma('vm:prefer-inline')
+  void add(TSyncOrAsyncMapper<dynamic, T> callback) => _callbacks.add(callback);
 
   /// Adds multiple callbacks to the controller.
-  void addAll(_CallbackList<T> callbacks) {
-    _callbacks.addAll(callbacks);
-  }
+  @pragma('vm:prefer-inline')
+  void addAll(_CallbackList<T> callbacks) => _callbacks.addAll(callbacks);
 
   /// Evaluates all registered callbacks.
-  FutureOr<void> complete() {
-    return completeWith<void>((results) {});
-  }
+  @pragma('vm:prefer-inline')
+  FutureOr<void> complete() => completeWith<void>((results) {});
 
   /// Evaluates all registered callbacks and returns the first result.
+  @pragma('vm:prefer-inline')
   FutureOr<T> completeWithFirst() => completeWith<T>(
         (r) => r is Future<List<T>> ? r.then((e) => e.first) : r.first,
       );
 
   /// Evaluates all registered callbacks and returns the last result.
+  @pragma('vm:prefer-inline')
   FutureOr<T> completeWithLast() => completeWith<T>(
         (r) => r is Future<List<T>> ? r.then((e) => e.last) : r.last,
       );
 
   /// Evaluates all registered callbacks and returns all the results.
+  @pragma('vm:prefer-inline')
   FutureOr<List<T>> completeWithAll() => completeWith((r) => r);
 
   /// Evaluates all registered callbacks and returns the results, as

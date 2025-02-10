@@ -12,7 +12,7 @@
 
 import 'dart:async';
 
-import 'sequential.dart';
+import '_sequential.dart';
 import 'consec.dart';
 
 // ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░

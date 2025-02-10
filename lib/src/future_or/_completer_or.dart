@@ -19,6 +19,7 @@ import 'dart:async';
 /// Similar to [CompleterOr], this class allows you to handle both synchronous
 /// and asynchronous results. It provides methods to complete the object with
 /// a value, and to retrieve the result.
+@Deprecated('Prefer using SafeCompleter from the df_safer_dart pacakge.')
 class CompleterOr<T> {
   //
   //

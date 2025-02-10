@@ -12,13 +12,14 @@
 
 import 'dart:async' show FutureOr;
 
-import 'completer_or.dart';
+import '_completer_or.dart';
 import 'consec.dart';
 
 // ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
 
 /// A queue that manages the execution of functions sequentially, allowing for
 /// optional throttling.
+@Deprecated('Prefer using Sequential from df_safer_dart package.')
 class Sequential {
   //
   //

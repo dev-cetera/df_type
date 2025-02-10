@@ -1,5 +1,5 @@
-<a href="https://www.buymeacoffee.com/robmllze" target="_blank"><img align="right" src="https://cdn.buymeacoffee.com/buttons/default-orange.png" height="48"></a>
-<a href="https://discord.gg/8hcxk6ZD" target="_blank"><img align="right" src="https://raw.githubusercontent.com/dev-cetera/resources/refs/heads/main/assets/discord_icon/discord_icon.svg" height="48"></a>
+<a href="https://www.buymeacoffee.com/dev_cetera" target="_blank"><img align="right" src="https://cdn.buymeacoffee.com/buttons/default-orange.png" height="48"></a>
+<a href="https://discord.gg/gEQ8y2nfyX" target="_blank"><img align="right" src="https://raw.githubusercontent.com/dev-cetera/resources/refs/heads/main/assets/discord_icon/discord_icon.svg" height="48"></a>
 
 Dart & Flutter Packages by dev-cetera.com & contributors.
 
@@ -81,70 +81,6 @@ void main() async {
   final doubleE = e.thenOr((prev) => prev * 2);
   print(doubleE); // Instance of 'Future<double>'
   print(await doubleE); // 5.43656
-
-  print('\n*** Manage Futures or values via FutureOrController:\n');
-  final a1 = Future.value(1);
-  final a2 = 2;
-  final a3 = Future.value(3);
-  final foc1 = FutureOrController<dynamic>([(_) => a1, (_) => a2, (_) => a3]);
-  final f1 = foc1.completeWithAll();
-  print(f1 is Future); // true
-  print(await f1); // [1, 2, 3]
-  final b1 = 1;
-  final b2 = 2;
-  final b3 = 2;
-  final foc2 = FutureOrController<dynamic>([(_) => b1, (_) => b2, (_) => b3]);
-  final f2 = foc2.completeWithAll();
-  print(f2 is Future); // false
-  print(f2); // [1, 2, 3]
-
-  print('\n*** CompleterOr works with async or sync values:\n');
-  final completer1 = CompleterOr<int>();
-  completer1.complete(1);
-  final c1 = completer1.futureOr;
-  print(c1 is Future); // false
-  final completer2 = CompleterOr<int>();
-  completer2.complete(Future.value(1));
-  final c2 = completer2.futureOr;
-  print(c2 is Future); // true
-
-  // The Sequential guarantees that functions will execute in the same
-  // order as they are added:
-  print('\n*** Test function queue:\n');
-  final sequential = Sequential();
-  sequential.add((prev) async {
-    print('Previous: $prev');
-    print('Function 1 running');
-    await Future<void>.delayed(const Duration(seconds: 3));
-    print('Function 1 completed');
-    return 1;
-  });
-  sequential.add((prev) async {
-    print('Previous: $prev');
-    await Future<void>.delayed(const Duration(seconds: 2));
-    print('Function 2 completed');
-    return 2;
-  });
-  sequential.add((prev) async {
-    print('Previous: $prev');
-    await Future<void>.delayed(const Duration(seconds: 1));
-    print('Function 3 completed');
-    return 3;
-  });
-  await sequential.add((prev) async {
-    print('Previous: $prev');
-    await Future<void>.delayed(const Duration(seconds: 1));
-    print('Function 3 completed');
-  });
-  // Prints:
-  // Function 1 running
-  // Function 1 completed
-  // Function 2 running
-  // Function 2 completed
-  // Function 3 running
-  // Function 3 completed
-  print(sequential.add((_) => 'Hello').runtimeType); // String
-  print(sequential.add((prev) => '$prev World!')); // Hello World!
 }
 ```
 
@@ -156,8 +92,8 @@ This is an open-source project, and we warmly welcome contributions from everyon
 
 ### Ways you can contribute
 
-- **Buy me a coffee:** If you'd like to support the project financially, consider [buying me a coffee](https://www.buymeacoffee.com/robmllze). Your support helps cover the costs of development and keeps the project growing.
-- **Find us on Discord:** Feel free to ask questions and engage with the community here: https://discord.gg/8hcxk6ZD.
+- **Buy me a coffee:** If you'd like to support the project financially, consider [buying me a coffee](https://www.buymeacoffee.com/dev_cetera). Your support helps cover the costs of development and keeps the project growing.
+- **Find us on Discord:** Feel free to ask questions and engage with the community here: https://discord.gg/gEQ8y2nfyX.
 - **Share your ideas:** Every perspective matters, and your ideas can spark innovation.
 - **Help others:** Engage with other users by offering advice, solutions, or troubleshooting assistance.
 - **Report bugs:** Help us identify and fix issues to make the project more robust.
@@ -169,9 +105,9 @@ No matter how you choose to contribute, your involvement is greatly appreciated 
 
 ### We drink a lot of coffee...
 
-If you're enjoying this package and find it valuable, consider showing your appreciation with a small donation. Every bit helps in supporting future development. You can donate here: https://www.buymeacoffee.com/robmllze
+If you're enjoying this package and find it valuable, consider showing your appreciation with a small donation. Every bit helps in supporting future development. You can donate here: https://www.buymeacoffee.com/dev_cetera
 
-<a href="https://www.buymeacoffee.com/robmllze" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" height="40"></a>
+<a href="https://www.buymeacoffee.com/dev_cetera" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" height="40"></a>
 
 ## License
 

@@ -53,10 +53,7 @@ final class StreamUtility {
   }
 
   /// Creates a [Stream] that polls a [callback] at a specified [interval].
-  Stream<T> newPoller<T>(
-    Future<T> Function() callback,
-    Duration interval,
-  ) {
+  Stream<T> newPoller<T>(Future<T> Function() callback, Duration interval) {
     final controller = StreamController<T>.broadcast();
     Timer? timer;
 

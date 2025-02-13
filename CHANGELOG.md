@@ -1,14 +1,19 @@
 # Changelog
 
-## [0.8.0]
+## [0.10.0]
 
-- Released @ 1/2025 (UTC)
-- breaking: Remove redundant code
+- Released @ 2/2025 (UTC)
+- breaking: Improve structure and refactor
 
 ## [0.8.0]
 
 - Released @ 1/2025 (UTC)
 - breaking: Removed some components and moved to df_safer_dart package
+
+## [0.8.0]
+
+- Released @ 1/2025 (UTC)
+- breaking: Remove redundant code
 
 ## [0.7.7]
 

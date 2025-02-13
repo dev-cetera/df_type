@@ -38,9 +38,7 @@ class Sequential {
 
   /// Creates an [Sequential] with an optional [buffer] for throttling
   /// execution.
-  Sequential({
-    Duration? buffer,
-  }) : _buffer = buffer;
+  Sequential({Duration? buffer}) : _buffer = buffer;
 
   /// Adds a [function] to the queue that processes the previous value.
   /// Applies an optional [buffer] duration to throttle the execution.
@@ -78,12 +76,9 @@ class Sequential {
   FutureOr<T> _enqueue<T>(FutureOr<T> Function(dynamic previous) function) {
     _isEmpty = false;
     final temp = consec(
-      consec(
-        _current,
-        (previous) {
-          return function(previous);
-        },
-      ),
+      consec(_current, (previous) {
+        return function(previous);
+      }),
       (result) {
         _isEmpty = true;
         return result;

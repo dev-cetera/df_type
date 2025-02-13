@@ -58,14 +58,14 @@ class SequentialController<T> {
   /// Evaluates all registered callbacks and returns the first result.
   @pragma('vm:prefer-inline')
   FutureOr<T> completeWithFirst() => completeWith<T>(
-        (r) => r is Future<List<T>> ? r.then((e) => e.first) : r.first,
-      );
+    (r) => r is Future<List<T>> ? r.then((e) => e.first) : r.first,
+  );
 
   /// Evaluates all registered callbacks and returns the last result.
   @pragma('vm:prefer-inline')
   FutureOr<T> completeWithLast() => completeWith<T>(
-        (r) => r is Future<List<T>> ? r.then((e) => e.last) : r.last,
-      );
+    (r) => r is Future<List<T>> ? r.then((e) => e.last) : r.last,
+  );
 
   /// Evaluates all registered callbacks and returns all the results.
   @pragma('vm:prefer-inline')

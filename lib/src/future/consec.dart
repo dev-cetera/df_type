@@ -26,9 +26,7 @@ FutureOr<R> consecList<R>(
 }) {
   try {
     if (items.whereType<Future<dynamic>>().isNotEmpty) {
-      return Future.wait(
-        items.map((item) async => item),
-      ).then((resolvedItems) {
+      return Future.wait(items.map((item) async => item)).then((resolvedItems) {
         return callback(resolvedItems);
       });
     } else {
@@ -47,12 +45,7 @@ FutureOr<R> consec<A, R>(
   FutureOr<R> Function(A a) callback, {
   void Function(Object e)? onError,
 }) {
-  return consecList<R>(
-    [a],
-    (items) => callback(
-      items[0] as A,
-    ),
-  );
+  return consecList<R>([a], (items) => callback(items[0] as A));
 }
 
 /// Maps two synchronous or asynchronous values to a single value.
@@ -63,13 +56,10 @@ FutureOr<R> consec2<A, B, R>(
   FutureOr<R> Function(A a, B b) callback, {
   void Function(Object e)? onError,
 }) {
-  return consecList<R>(
-    [a, b],
-    (items) => callback(
-      items[0] as A,
-      items[1] as B,
-    ),
-  );
+  return consecList<R>([
+    a,
+    b,
+  ], (items) => callback(items[0] as A, items[1] as B),);
 }
 
 /// Maps three synchronous or asynchronous values to a single value.
@@ -81,14 +71,11 @@ FutureOr<R> consec3<A, B, C, R>(
   FutureOr<R> Function(A a, B b, C c) callback, {
   void Function(Object e)? onError,
 }) {
-  return consecList<R>(
-    [a, b, c],
-    (items) => callback(
-      items[0] as A,
-      items[1] as B,
-      items[2] as C,
-    ),
-  );
+  return consecList<R>([
+    a,
+    b,
+    c,
+  ], (items) => callback(items[0] as A, items[1] as B, items[2] as C),);
 }
 
 /// Maps four synchronous or asynchronous values to a single value.
@@ -103,12 +90,8 @@ FutureOr<R> consec4<A, B, C, D, R>(
 }) {
   return consecList<R>(
     [a, b, c, d],
-    (items) => callback(
-      items[0] as A,
-      items[1] as B,
-      items[2] as C,
-      items[3] as D,
-    ),
+    (items) =>
+        callback(items[0] as A, items[1] as B, items[2] as C, items[3] as D),
   );
 }
 

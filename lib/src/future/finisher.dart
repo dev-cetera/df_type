@@ -16,11 +16,10 @@ import 'dart:async';
 
 /// A utility for producing and completing [FutureOr] objects.
 ///
-/// Similar to [CompleterOr], this class allows you to handle both synchronous
+/// Similar to [Finisher], this class allows you to handle both synchronous
 /// and asynchronous results. It provides methods to complete the object with
 /// a value, and to retrieve the result.
-@Deprecated('Prefer using SafeCompleter from the df_safer_dart pacakge.')
-class CompleterOr<T> {
+class Finisher<T> {
   //
   //
   //
@@ -34,11 +33,11 @@ class CompleterOr<T> {
   //
 
   /// Completes the operation with the provided [value]. If [value] is a
-  /// [Future], the [CompleterOr] will wait for it to complete. If [value] is
+  /// [Future], the [Finisher] will wait for it to complete. If [value] is
   /// synchronous, it will be stored directly.
   ///
   /// This method can only be called once. Subsequent calls have no effect if
-  /// the [CompleterOr] has already been completed.
+  /// the [Finisher] has already been completed.
   void complete(FutureOr<T> value) {
     if (isCompleted) return;
     if (value is Future<T>) {
@@ -52,14 +51,14 @@ class CompleterOr<T> {
   /// Returns the stored synchronous value if available, otherwise returns
   /// the [Future] that resolves to the value.
   ///
-  /// If the [CompleterOr] has been completed with a synchronous value, that
+  /// If the [Finisher] has been completed with a synchronous value, that
   /// value is returned directly. Otherwise, the [Future] is returned.
   @pragma('vm:prefer-inline')
   FutureOr<T> get futureOr => _value ?? _completer.future;
 
-  /// Checks if the value has been set or if the [CompleterOr] is completed.
+  /// Checks if the value has been set or if the [Finisher] is completed.
   ///
-  /// This is `true` if either the synchronous value is set or the [CompleterOr]
+  /// This is `true` if either the synchronous value is set or the [Finisher]
   /// has been completed through [complete].  When `true`, [complete] should
   /// not be called again.
   @pragma('vm:prefer-inline')

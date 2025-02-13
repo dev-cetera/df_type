@@ -88,14 +88,14 @@ void main() async {
   final a1 = Future.value(1);
   final a2 = 2;
   final a3 = Future.value(3);
-  final foc1 = FutureOrController<dynamic>([(_) => a1, (_) => a2, (_) => a3]);
+  final foc1 = SequentialController<dynamic>([(_) => a1, (_) => a2, (_) => a3]);
   final f1 = foc1.completeWithAll();
   print(f1 is Future); // true
   print(await f1); // [1, 2, 3]
   final b1 = 1;
   final b2 = 2;
   final b3 = 2;
-  final foc2 = FutureOrController<dynamic>([(_) => b1, (_) => b2, (_) => b3]);
+  final foc2 = SequentialController<dynamic>([(_) => b1, (_) => b2, (_) => b3]);
   final f2 = foc2.completeWithAll();
   print(f2 is Future); // false
   print(f2); // [1, 2, 3]

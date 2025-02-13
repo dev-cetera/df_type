@@ -12,18 +12,18 @@
 
 import 'dart:async';
 
-import '_sequential.dart';
+import 'sequential.dart';
 import 'consec.dart';
 
 // ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
 
 /// A controller for managing [FutureOr] operations and capturing exceptions.
-class FutureOrController<T> {
-  FutureOrController._();
+class SequentialController<T> {
+  SequentialController._();
 
-  /// Factory constructor to create a [FutureOrController] with optional callbacks.
-  factory FutureOrController([_CallbackList<T> callbacks = const []]) {
-    final instance = FutureOrController<T>._();
+  /// Factory constructor to create a [SequentialController] with optional callbacks.
+  factory SequentialController([_CallbackList<T> callbacks = const []]) {
+    final instance = SequentialController<T>._();
     instance.addAll(callbacks);
     return instance;
   }
@@ -98,7 +98,7 @@ class FutureOrController<T> {
       }
     }
     final last = sequential.last;
-    if (last is Future) {
+    if (last is Future<void>) {
       return last.then(
         (_) => consolodator(Future.wait(values.map((e) async => await e))),
       );
@@ -115,7 +115,6 @@ class FutureOrController<T> {
     void Function(T)? cleanUp,
   }) {
     var hasFuture = false;
-
     for (final value in values) {
       if (value is Future<T>) {
         hasFuture = true;

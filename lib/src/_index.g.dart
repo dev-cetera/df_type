@@ -12,6 +12,7 @@ export './type_checks/is_equatable.dart';
 export './type_checks/is_subtype.dart';
 export './type_checks/type_equality.dart';
 export './type_checks/is_nullable.dart';
+export './type_checks/safe_to_string.dart';
 export './conversions/string_to_duration.dart';
 export './extensions/try_or_null_on_function_x.dart';
 export './extensions/value_of_on_enum_x.dart';

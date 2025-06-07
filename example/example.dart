@@ -74,7 +74,6 @@ void main() async {
   final Duration duration = const ConvertStringToDuration(
     '11:11:00.00',
   ).toDuration();
-  final Duration duration = const ConvertStringToDuration('11:11:00.00').toDuration();
   print(duration); // 11:11:00.000000
 
   print('\n*** Use consec with FutureOr:\n');

@@ -74,9 +74,10 @@ void main() async {
   final Duration duration = const ConvertStringToDuration(
     '11:11:00.00',
   ).toDuration();
+  final Duration duration = const ConvertStringToDuration('11:11:00.00').toDuration();
   print(duration); // 11:11:00.000000
 
-  print('\n*** Use thenOr with FutureOr:\n');
+  print('\n*** Use consec with FutureOr:\n');
   print(consec(1, (prev) => prev + 1)); // 2
   FutureOr<double> pi = 3.14159;
   final doublePi = consec(pi, (prev) => prev * 2);

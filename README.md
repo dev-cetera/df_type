@@ -71,16 +71,6 @@ void main() async {
   print('\n*** Convert a String to a Duration:\n');
   final Duration duration = const ConvertStringToDuration('11:11:00.00').toDuration();
   print(duration); // 11:11:00.000000
-
-  print('\n*** Use thenOr with FutureOr:\n');
-  print(1.thenOr((prev) => prev + 1)); // 2
-  FutureOr<double> pi = 3.14159;
-  final doublePi = pi.thenOr((prev) => prev * 2);
-  print(doublePi); // 6.2832
-  FutureOr<double> e = Future.value(2.71828);
-  final doubleE = e.thenOr((prev) => prev * 2);
-  print(doubleE); // Instance of 'Future<double>'
-  print(await doubleE); // 5.43656
 }
 ```
 

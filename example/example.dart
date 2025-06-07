@@ -71,8 +71,9 @@ void main() async {
   print(letOrNull<double>('123')); // 123.0
 
   print('\n*** Convert a String to a Duration:\n');
-  final Duration duration =
-      const ConvertStringToDuration('11:11:00.00').toDuration();
+  final Duration duration = const ConvertStringToDuration(
+    '11:11:00.00',
+  ).toDuration();
   print(duration); // 11:11:00.000000
 
   print('\n*** Use thenOr with FutureOr:\n');

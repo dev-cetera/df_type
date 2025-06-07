@@ -65,11 +65,10 @@ class ExecutionQueue {
     final executable = _Executable<T>(
       buffer == null
           ? function
-          : (prev) async =>
-              (await Future.wait<T>([
-                Future.value(function(prev)),
-                Future.delayed(buffer),
-              ])).first,
+          : (prev) async => (await Future.wait<T>([
+              Future.value(function(prev)),
+              Future.delayed(buffer),
+            ])).first,
     );
     _queue.add(executable);
     final result = consec(_execute(), (_) => executable.completer.futureOr);

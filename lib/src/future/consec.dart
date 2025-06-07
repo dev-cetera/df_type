@@ -28,30 +28,25 @@ FutureOr<R> consecList<R>(
 }) {
   for (final item in items) {
     if (item is Future) {
-      return Future.wait(
-        items.map((e) async => await e),
-        eagerError: true,
-      ).then((resolvedItems) => callback(resolvedItems)).catchError(
-        (Object e, StackTrace? s) {
-          if (onError != null) {
-            return Future.sync(() => onError(e, s)).then((_) => throw e);
-          }
-          throw e;
-        },
-      );
+      return Future.wait(items.map((e) async => await e), eagerError: true)
+          .then((resolvedItems) => callback(resolvedItems))
+          .catchError((Object e, StackTrace? s) {
+            if (onError != null) {
+              return Future.sync(() => onError(e, s)).then((_) => throw e);
+            }
+            throw e;
+          });
     }
   }
   try {
     final result = callback(items.cast<dynamic>());
     if (result is Future<R>) {
-      return result.catchError(
-        (Object e, StackTrace? s) {
-          if (onError != null) {
-            return Future.sync(() => onError(e, s)).then((_) => throw e);
-          }
-          throw e;
-        },
-      );
+      return result.catchError((Object e, StackTrace? s) {
+        if (onError != null) {
+          return Future.sync(() => onError(e, s)).then((_) => throw e);
+        }
+        throw e;
+      });
     }
     return result;
   } catch (e, s) {
@@ -88,10 +83,7 @@ FutureOr<R> consec2<A, B, R>(
   TOnErrorCallback? onError,
 }) {
   return consecList<R>(
-    [
-      a,
-      b,
-    ],
+    [a, b],
     (items) => callback(items[0] as A, items[1] as B),
     onError: onError,
   );
@@ -107,11 +99,7 @@ FutureOr<R> consec3<A, B, C, R>(
   TOnErrorCallback? onError,
 }) {
   return consecList<R>(
-    [
-      a,
-      b,
-      c,
-    ],
+    [a, b, c],
     (items) => callback(items[0] as A, items[1] as B, items[2] as C),
     onError: onError,
   );
@@ -129,7 +117,8 @@ FutureOr<R> consec4<A, B, C, D, R>(
 }) {
   return consecList<R>(
     [a, b, c, d],
-    (items) => callback(items[0] as A, items[1] as B, items[2] as C, items[3] as D),
+    (items) =>
+        callback(items[0] as A, items[1] as B, items[2] as C, items[3] as D),
     onError: onError,
   );
 }

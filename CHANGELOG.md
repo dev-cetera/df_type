@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.10.4]
+
+- Released @ 6/2025 (UTC)
+- bugfix: Fix error propagation issue with consec and make more robust
+
 ## [0.10.3]
 
 - Released @ 2/2025 (UTC)

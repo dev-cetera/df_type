@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.12.0]
+
+- Released @ 6/2025 (UTC)
+- breaking: Simplify package
+
 ## [0.10.5]
 
 - Released @ 6/2025 (UTC)

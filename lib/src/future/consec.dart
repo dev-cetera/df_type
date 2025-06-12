@@ -10,6 +10,8 @@
 // ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
 //.title~
 
+// ignore_for_file: require_trailing_commas
+
 import 'dart:async' show FutureOr;
 
 // ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
@@ -22,8 +24,8 @@ typedef TOnErrorCallback = FutureOr<void> Function(Object e, StackTrace? s);
 /// Maps a list containing any mix of synchronous or asynchronous values to a
 /// single value.
 FutureOr<R> consecList<R>(
-  List<FutureOr<dynamic>> items,
-  TSyncOrAsyncMapper<List<dynamic>, R> callback, {
+  Iterable<FutureOr<dynamic>> items,
+  TSyncOrAsyncMapper<Iterable<dynamic>, R> callback, {
   TOnErrorCallback? onError,
 }) {
   for (final item in items) {
@@ -31,11 +33,11 @@ FutureOr<R> consecList<R>(
       return Future.wait(items.map((e) async => await e), eagerError: true)
           .then((resolvedItems) => callback(resolvedItems))
           .catchError((Object e, StackTrace? s) {
-            if (onError != null) {
-              return Future.sync(() => onError(e, s)).then((_) => throw e);
-            }
-            throw e;
-          });
+        if (onError != null) {
+          return Future.sync(() => onError(e, s)).then((_) => throw e);
+        }
+        throw e;
+      });
     }
   }
   try {
@@ -69,7 +71,7 @@ FutureOr<R> consec<A, R>(
 }) {
   return consecList<R>(
     [a],
-    (items) => callback(items[0] as A),
+    (items) => callback(items.elementAt(0) as A),
     onError: onError,
   );
 }
@@ -84,7 +86,7 @@ FutureOr<R> consec2<A, B, R>(
 }) {
   return consecList<R>(
     [a, b],
-    (items) => callback(items[0] as A, items[1] as B),
+    (items) => callback(items.elementAt(0) as A, items.elementAt(1) as B),
     onError: onError,
   );
 }
@@ -100,7 +102,7 @@ FutureOr<R> consec3<A, B, C, R>(
 }) {
   return consecList<R>(
     [a, b, c],
-    (items) => callback(items[0] as A, items[1] as B, items[2] as C),
+    (items) => callback(items.elementAt(0) as A, items.elementAt(1) as B, items.elementAt(2) as C),
     onError: onError,
   );
 }
@@ -117,8 +119,8 @@ FutureOr<R> consec4<A, B, C, D, R>(
 }) {
   return consecList<R>(
     [a, b, c, d],
-    (items) =>
-        callback(items[0] as A, items[1] as B, items[2] as C, items[3] as D),
+    (items) => callback(items.elementAt(0) as A, items.elementAt(1) as B, items.elementAt(2) as C,
+        items.elementAt(3) as D),
     onError: onError,
   );
 }
@@ -137,11 +139,11 @@ FutureOr<R> consec5<A, B, C, D, E, R>(
   return consecList<R>(
     [a, b, c, d, e],
     (items) => callback(
-      items[0] as A,
-      items[1] as B,
-      items[2] as C,
-      items[3] as D,
-      items[4] as E,
+      items.elementAt(0) as A,
+      items.elementAt(1) as B,
+      items.elementAt(2) as C,
+      items.elementAt(3) as D,
+      items.elementAt(4) as E,
     ),
     onError: onError,
   );
@@ -162,12 +164,12 @@ FutureOr<R> consec6<A, B, C, D, E, F, R>(
   return consecList<R>(
     [a, b, c, d, e, f],
     (items) => callback(
-      items[0] as A,
-      items[1] as B,
-      items[2] as C,
-      items[3] as D,
-      items[4] as E,
-      items[5] as F,
+      items.elementAt(0) as A,
+      items.elementAt(1) as B,
+      items.elementAt(2) as C,
+      items.elementAt(3) as D,
+      items.elementAt(4) as E,
+      items.elementAt(5) as F,
     ),
     onError: onError,
   );
@@ -189,13 +191,13 @@ FutureOr<R> consec7<A, B, C, D, E, F, G, R>(
   return consecList<R>(
     [a, b, c, d, e, f, g],
     (items) => callback(
-      items[0] as A,
-      items[1] as B,
-      items[2] as C,
-      items[3] as D,
-      items[4] as E,
-      items[5] as F,
-      items[6] as G,
+      items.elementAt(0) as A,
+      items.elementAt(1) as B,
+      items.elementAt(2) as C,
+      items.elementAt(3) as D,
+      items.elementAt(4) as E,
+      items.elementAt(5) as F,
+      items.elementAt(6) as G,
     ),
     onError: onError,
   );
@@ -218,14 +220,14 @@ FutureOr<R> consec8<A, B, C, D, E, F, G, H, R>(
   return consecList<R>(
     [a, b, c, d, e, f, g, h],
     (items) => callback(
-      items[0] as A,
-      items[1] as B,
-      items[2] as C,
-      items[3] as D,
-      items[4] as E,
-      items[5] as F,
-      items[6] as G,
-      items[7] as H,
+      items.elementAt(0) as A,
+      items.elementAt(1) as B,
+      items.elementAt(2) as C,
+      items.elementAt(3) as D,
+      items.elementAt(4) as E,
+      items.elementAt(5) as F,
+      items.elementAt(6) as G,
+      items.elementAt(7) as H,
     ),
     onError: onError,
   );
@@ -249,15 +251,15 @@ FutureOr<R> consec9<A, B, C, D, E, F, G, H, I, R>(
   return consecList<R>(
     [a, b, c, d, e, f, g, h, i],
     (items) => callback(
-      items[0] as A,
-      items[1] as B,
-      items[2] as C,
-      items[3] as D,
-      items[4] as E,
-      items[5] as F,
-      items[6] as G,
-      items[7] as H,
-      items[8] as I,
+      items.elementAt(0) as A,
+      items.elementAt(1) as B,
+      items.elementAt(2) as C,
+      items.elementAt(3) as D,
+      items.elementAt(4) as E,
+      items.elementAt(5) as F,
+      items.elementAt(6) as G,
+      items.elementAt(7) as H,
+      items.elementAt(8) as I,
     ),
     onError: onError,
   );

@@ -15,9 +15,21 @@ import 'dart:async';
 // ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
 
 final class StreamUtility {
+  //
+  //
+  //
+
   const StreamUtility._();
 
+  //
+  //
+  //
+
   static final i = const StreamUtility._();
+
+  //
+  //
+  //
 
   /// Waits for the first value from the [Stream] and returns it as a [Future].
   Future<T> firstToFuture<T>(Stream<T> stream) {
@@ -52,11 +64,14 @@ final class StreamUtility {
     return completer.future;
   }
 
+  //
+  //
+  //
+
   /// Creates a [Stream] that polls a [callback] at a specified [interval].
   Stream<T> newPoller<T>(Future<T> Function() callback, Duration interval) {
     final controller = StreamController<T>.broadcast();
     Timer? timer;
-
     Future<void> poll() async {
       try {
         final result = await callback();
@@ -69,12 +84,10 @@ final class StreamUtility {
     controller.onListen = () {
       timer = Timer.periodic(interval, (_) => poll());
     };
-
     controller.onCancel = () {
       timer?.cancel();
       controller.close();
     };
-
     return controller.stream;
   }
 }

@@ -13,4 +13,4 @@
 /// A package designed to simplify and enhance interactions with Dart types.
 library;
 
-export 'src/_index.g.dart';
+export 'src/_src.g.dart';

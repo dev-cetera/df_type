@@ -16,8 +16,8 @@ import 'dart:async' show FutureOr;
 
 // ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
 
-typedef TSyncOrAsyncMapper<A, R> = FutureOr<R> Function(A a);
-typedef TOnErrorCallback = FutureOr<void> Function(Object e, StackTrace? s);
+typedef _TSyncOrAsyncMapper<A, R> = FutureOr<R> Function(A a);
+typedef _TOnErrorCallback = FutureOr<void> Function(Object e, StackTrace? s);
 
 // ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
 
@@ -25,19 +25,19 @@ typedef TOnErrorCallback = FutureOr<void> Function(Object e, StackTrace? s);
 /// single value.
 FutureOr<R> consecList<R>(
   Iterable<FutureOr<dynamic>> items,
-  TSyncOrAsyncMapper<Iterable<dynamic>, R> callback, {
-  TOnErrorCallback? onError,
+  _TSyncOrAsyncMapper<Iterable<dynamic>, R> callback, {
+  _TOnErrorCallback? onError,
 }) {
   for (final item in items) {
     if (item is Future) {
       return Future.wait(items.map((e) async => await e), eagerError: true)
           .then((resolvedItems) => callback(resolvedItems))
           .catchError((Object e, StackTrace? s) {
-            if (onError != null) {
-              return Future.sync(() => onError(e, s)).then((_) => throw e);
-            }
-            throw e;
-          });
+        if (onError != null) {
+          return Future.sync(() => onError(e, s)).then((_) => throw e);
+        }
+        throw e;
+      });
     }
   }
   try {
@@ -67,7 +67,7 @@ FutureOr<R> consecList<R>(
 FutureOr<R> consec<A, R>(
   FutureOr<A> a,
   FutureOr<R> Function(A a) callback, {
-  TOnErrorCallback? onError,
+  _TOnErrorCallback? onError,
 }) {
   return consecList<R>(
     [a],
@@ -82,7 +82,7 @@ FutureOr<R> consec2<A, B, R>(
   FutureOr<A> a,
   FutureOr<B> b,
   FutureOr<R> Function(A a, B b) callback, {
-  TOnErrorCallback? onError,
+  _TOnErrorCallback? onError,
 }) {
   return consecList<R>(
     [a, b],
@@ -98,7 +98,7 @@ FutureOr<R> consec3<A, B, C, R>(
   FutureOr<B> b,
   FutureOr<C> c,
   FutureOr<R> Function(A a, B b, C c) callback, {
-  TOnErrorCallback? onError,
+  _TOnErrorCallback? onError,
 }) {
   return consecList<R>(
     [a, b, c],
@@ -119,7 +119,7 @@ FutureOr<R> consec4<A, B, C, D, R>(
   FutureOr<C> c,
   FutureOr<D> d,
   FutureOr<R> Function(A a, B b, C c, D d) callback, {
-  TOnErrorCallback? onError,
+  _TOnErrorCallback? onError,
 }) {
   return consecList<R>(
     [a, b, c, d],
@@ -142,7 +142,7 @@ FutureOr<R> consec5<A, B, C, D, E, R>(
   FutureOr<D> d,
   FutureOr<E> e,
   FutureOr<R> Function(A a, B b, C c, D d, E e) callback, {
-  TOnErrorCallback? onError,
+  _TOnErrorCallback? onError,
 }) {
   return consecList<R>(
     [a, b, c, d, e],
@@ -167,7 +167,7 @@ FutureOr<R> consec6<A, B, C, D, E, F, R>(
   FutureOr<E> e,
   FutureOr<F> f,
   FutureOr<R> Function(A a, B b, C c, D d, E e, F f) callback, {
-  TOnErrorCallback? onError,
+  _TOnErrorCallback? onError,
 }) {
   return consecList<R>(
     [a, b, c, d, e, f],
@@ -194,7 +194,7 @@ FutureOr<R> consec7<A, B, C, D, E, F, G, R>(
   FutureOr<F> f,
   FutureOr<G> g,
   FutureOr<R> Function(A a, B b, C c, D d, E e, F f, G g) callback, {
-  TOnErrorCallback? onError,
+  _TOnErrorCallback? onError,
 }) {
   return consecList<R>(
     [a, b, c, d, e, f, g],
@@ -223,7 +223,7 @@ FutureOr<R> consec8<A, B, C, D, E, F, G, H, R>(
   FutureOr<G> g,
   FutureOr<H> h,
   FutureOr<R> Function(A a, B b, C c, D d, E e, F f, G g, H h) callback, {
-  TOnErrorCallback? onError,
+  _TOnErrorCallback? onError,
 }) {
   return consecList<R>(
     [a, b, c, d, e, f, g, h],
@@ -254,7 +254,7 @@ FutureOr<R> consec9<A, B, C, D, E, F, G, H, I, R>(
   FutureOr<H> h,
   FutureOr<I> i,
   FutureOr<R> Function(A a, B b, C c, D d, E e, F f, G g, H h, I i) callback, {
-  TOnErrorCallback? onError,
+  _TOnErrorCallback? onError,
 }) {
   return consecList<R>(
     [a, b, c, d, e, f, g, h, i],

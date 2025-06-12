@@ -40,6 +40,7 @@ import 'package:equatable/equatable.dart';
 /// Returns `true` if T is one of these types or implements Equatable.
 bool isEquatable<T>() {
   return <Type>{
+    Equatable,
     BigInt,
     bool,
     DateTime,
@@ -57,6 +58,5 @@ bool isEquatable<T>() {
     Symbol,
     Type,
     Uri,
-    Equatable,
   }.contains(T);
 }

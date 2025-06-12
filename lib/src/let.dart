@@ -12,7 +12,7 @@
 
 import 'dart:convert' show JsonDecoder;
 
-import '_index.g.dart';
+import '_src.g.dart';
 
 // ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
 
@@ -144,8 +144,7 @@ Map<K, V>? letMapOrNull<K, V>(
       final temp = decoded.entries
           .map((entry) {
             final convertedKey = letOrNull<K>(entry.key);
-            final convertedValue =
-                letOrNull<V>(entry.value) ?? letOrNull<V?>(nullFallback);
+            final convertedValue = letOrNull<V>(entry.value) ?? letOrNull<V?>(nullFallback);
             if (filterNulls) {
               if (!isNullable<K>() && convertedKey == null) {
                 return const _Empty();

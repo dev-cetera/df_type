@@ -71,9 +71,9 @@ void main() async {
   print(letOrNull<double>('123')); // 123.0
 
   print('\n*** Convert a String to a Duration:\n');
-  final Duration duration = const ConvertStringToDuration(
+  final Duration? duration = const ConvertStringToDuration(
     '11:11:00.00',
-  ).toDuration();
+  ).toDurationOrNull();
   print(duration); // 11:11:00.000000
 
   print('\n*** Use consec with FutureOr:\n');
@@ -85,20 +85,4 @@ void main() async {
   final doubleE = consec(e, (prev) => prev * 2);
   print(doubleE); // Instance of 'Future<double>'
   print(await doubleE); // 5.43656
-
-  print('\n*** Manage Futures or values via FutureOrController:\n');
-  final a1 = Future.value(1);
-  final a2 = 2;
-  final a3 = Future.value(3);
-  final foc1 = SequentialController<dynamic>([(_) => a1, (_) => a2, (_) => a3]);
-  final f1 = foc1.completeWithAll();
-  print(f1 is Future); // true
-  print(await f1); // [1, 2, 3]
-  final b1 = 1;
-  final b2 = 2;
-  final b3 = 2;
-  final foc2 = SequentialController<dynamic>([(_) => b1, (_) => b2, (_) => b3]);
-  final f2 = foc2.completeWithAll();
-  print(f2 is Future); // false
-  print(f2); // [1, 2, 3]
 }

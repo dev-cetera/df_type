@@ -11,9 +11,21 @@
 //.title~
 
 final class DateTimeUtility {
+  //
+  //
+  //
+
   const DateTimeUtility._();
 
+  //
+  //
+  //
+
   static final i = const DateTimeUtility._();
+
+  //
+  //
+  //
 
   /// Returns the last date in the list of dates, ignoring null values.
   DateTime? last(Iterable<DateTime?>? dates) {
@@ -23,6 +35,10 @@ final class DateTimeUtility {
     return filteredDates.reduce((a, b) => a.isAfter(b) ? a : b);
   }
 
+  //
+  //
+  //
+
   /// Returns the first date in the list of dates, ignoring null values.
   DateTime? first(Iterable<DateTime?>? dates) {
     if (dates == null) return null;
@@ -30,6 +46,10 @@ final class DateTimeUtility {
     if (filteredDates.isEmpty) return null;
     return filteredDates.reduce((a, b) => a.isBefore(b) ? a : b);
   }
+
+  //
+  //
+  //
 
   /// Returns the average date in the list of dates, ignoring null values.
   DateTime? avg(Iterable<DateTime?>? dates) {
@@ -44,6 +64,10 @@ final class DateTimeUtility {
     return DateTime.fromMillisecondsSinceEpoch(avgMs);
   }
 
+  //
+  //
+  //
+
   /// Returns the median date in the list of dates, ignoring null values.
   DateTime? median(Iterable<DateTime?>? dates) {
     if (dates == null) return null;
@@ -53,8 +77,7 @@ final class DateTimeUtility {
     if (filteredDates.length.isOdd) {
       return filteredDates[middleIndex];
     } else {
-      final medianMs =
-          (filteredDates[middleIndex - 1].millisecondsSinceEpoch +
+      final medianMs = (filteredDates[middleIndex - 1].millisecondsSinceEpoch +
               filteredDates[middleIndex].millisecondsSinceEpoch) ~/
           2;
       return DateTime.fromMillisecondsSinceEpoch(medianMs);

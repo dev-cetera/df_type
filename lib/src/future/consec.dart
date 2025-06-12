@@ -33,11 +33,11 @@ FutureOr<R> consecList<R>(
       return Future.wait(items.map((e) async => await e), eagerError: true)
           .then((resolvedItems) => callback(resolvedItems))
           .catchError((Object e, StackTrace? s) {
-        if (onError != null) {
-          return Future.sync(() => onError(e, s)).then((_) => throw e);
-        }
-        throw e;
-      });
+            if (onError != null) {
+              return Future.sync(() => onError(e, s)).then((_) => throw e);
+            }
+            throw e;
+          });
     }
   }
   try {
@@ -102,7 +102,11 @@ FutureOr<R> consec3<A, B, C, R>(
 }) {
   return consecList<R>(
     [a, b, c],
-    (items) => callback(items.elementAt(0) as A, items.elementAt(1) as B, items.elementAt(2) as C),
+    (items) => callback(
+      items.elementAt(0) as A,
+      items.elementAt(1) as B,
+      items.elementAt(2) as C,
+    ),
     onError: onError,
   );
 }
@@ -119,8 +123,12 @@ FutureOr<R> consec4<A, B, C, D, R>(
 }) {
   return consecList<R>(
     [a, b, c, d],
-    (items) => callback(items.elementAt(0) as A, items.elementAt(1) as B, items.elementAt(2) as C,
-        items.elementAt(3) as D),
+    (items) => callback(
+      items.elementAt(0) as A,
+      items.elementAt(1) as B,
+      items.elementAt(2) as C,
+      items.elementAt(3) as D,
+    ),
     onError: onError,
   );
 }

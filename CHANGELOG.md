@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.10.5]
+
+- Released @ 6/2025 (UTC)
+- chore: Improve consec
+
 ## [0.10.4]
 
 - Released @ 6/2025 (UTC)

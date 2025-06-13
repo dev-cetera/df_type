@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.12.3]
+
+- Released @ 6/2025 (UTC)
+- feat: Add eagerError to OperationWaiter
+
 ## [0.12.2]
 
 - Released @ 6/2025 (UTC)

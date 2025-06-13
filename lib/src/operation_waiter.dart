@@ -32,8 +32,8 @@ class OperationWaiter<T> {
   OperationWaiter({
     _TOnErrorCallback? onError,
     List<_TOperation<T>> operations = const [],
-  }) : _onError = onError,
-       _operations = [...operations];
+  })  : _onError = onError,
+        _operations = [...operations];
 
   //
   //
@@ -59,13 +59,17 @@ class OperationWaiter<T> {
   //
   //
 
-  FutureOr<Iterable<T>> wait({_TOnErrorCallback? onError}) {
+  FutureOr<Iterable<T>> wait({
+    _TOnErrorCallback? onError,
+    bool eagerError = true,
+  }) {
     return waitAlikeF(
       _operations,
       onError: (Object e, StackTrace? s) {
         _onError?.call(e, s);
         onError?.call(e, s);
       },
+      eagerError: eagerError,
     );
   }
 }

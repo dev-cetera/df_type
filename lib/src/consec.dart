@@ -55,7 +55,10 @@ FutureOr<R> wait<R>(
   bool eagerError = true,
 }) {
   return waitF(
-    items.map((e) => () => e),
+    items.map(
+      (e) =>
+          () => e,
+    ),
     callback,
     onError: onError,
     eagerError: eagerError,
@@ -102,7 +105,9 @@ FutureOr<R> waitF<R>(
     if (onError != null) {
       final errResult = onError(firstSyncError, firstSyncStackTrace);
       if (errResult is Future) {
-        return errResult.then((_) => _throwError(firstSyncError!, firstSyncStackTrace));
+        return errResult.then(
+          (_) => _throwError(firstSyncError!, firstSyncStackTrace),
+        );
       }
     }
     _throwError(firstSyncError, firstSyncStackTrace);
@@ -111,14 +116,12 @@ FutureOr<R> waitF<R>(
     return Future.wait(
       buffer.map((e) async => await e),
       eagerError: eagerError,
-    ).then((items) => callback(items)).catchError(
-      (Object e, StackTrace? s) {
-        if (onError != null) {
-          return Future.sync(() => onError(e, s)).then((_) => throw e);
-        }
-        throw e;
-      },
-    );
+    ).then((items) => callback(items)).catchError((Object e, StackTrace? s) {
+      if (onError != null) {
+        return Future.sync(() => onError(e, s)).then((_) => throw e);
+      }
+      throw e;
+    });
   } else {
     try {
       final result = callback(buffer.cast<dynamic>());

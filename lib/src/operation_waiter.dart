@@ -32,8 +32,8 @@ class OperationWaiter<T> {
   OperationWaiter({
     _TOnErrorCallback? onError,
     List<_TOperation<T>> operations = const [],
-  })  : _onError = onError,
-        _operations = [...operations];
+  }) : _onError = onError,
+       _operations = [...operations];
 
   //
   //

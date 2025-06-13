@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.12.2]
+
+- Released @ 6/2025 (UTC)
+- refactor: Renamed ExecuteOperations to OperationWaiter
+
 ## [0.12.1]
 
 - Released @ 6/2025 (UTC)

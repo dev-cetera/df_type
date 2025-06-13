@@ -16,23 +16,24 @@ import '../df_type.dart';
 
 // ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
 
-class ExecuteOperations<T> {
+class OperationWaiter<T> {
   //
   //
   //
 
   final _TOnErrorCallback? _onError;
   final List<_TOperation<T>> _operations;
+  List<_TOperation<T>> get operations => _operations;
 
   //
   //
   //
 
-  ExecuteOperations({
+  OperationWaiter({
     _TOnErrorCallback? onError,
     List<_TOperation<T>> operations = const [],
-  }) : _onError = onError,
-       _operations = [...operations];
+  })  : _onError = onError,
+        _operations = [...operations];
 
   //
   //
@@ -42,17 +43,13 @@ class ExecuteOperations<T> {
     _operations.add(operation);
   }
 
-  //
-  //
-  //
+  void addAll(Iterable<_TOperation<T>> operations) {
+    _operations.addAll(operations);
+  }
 
   void remove(_TOperation<T> operation) {
     _operations.remove(operation);
   }
-
-  //
-  //
-  //
 
   void clear(_TOperation<T> operation) {
     _operations.clear();
@@ -62,9 +59,9 @@ class ExecuteOperations<T> {
   //
   //
 
-  FutureOr<Iterable<T>> execute({_TOnErrorCallback? onError}) {
-    return consecMap(
-      _operations.map((e) => e()),
+  FutureOr<Iterable<T>> wait({_TOnErrorCallback? onError}) {
+    return waitAlikeF(
+      _operations,
       onError: (Object e, StackTrace? s) {
         _onError?.call(e, s);
         onError?.call(e, s);

@@ -16,56 +16,128 @@ import 'dart:async' show FutureOr;
 
 // ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
 
-typedef _TSyncOrAsyncMapper<A, R> = FutureOr<R> Function(A a);
-typedef _TOnErrorCallback = FutureOr<void> Function(Object e, StackTrace? s);
-
-// ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-
-FutureOr<Iterable<T>> consecMap<T>(
+@pragma('vm:prefer-inline')
+FutureOr<Iterable<T>> waitAlike<T>(
   Iterable<FutureOr<T>> items, {
   _TOnErrorCallback? onError,
+  bool eagerError = true,
 }) {
-  return consecList(items, (e) => e.cast<T>(), onError: onError);
+  return wait<Iterable<T>>(
+    items,
+    (e) => e.cast<T>(),
+    onError: onError,
+    eagerError: eagerError,
+  );
 }
 
-/// Maps a list containing any mix of synchronous or asynchronous values to a
-/// single value.
-FutureOr<R> consecList<R>(
+@pragma('vm:prefer-inline')
+FutureOr<Iterable<T>> waitAlikeF<T>(
+  Iterable<_TFactory<dynamic>> itemFactories, {
+  _TOnErrorCallback? onError,
+  bool eagerError = true,
+}) {
+  return waitF<Iterable<T>>(
+    itemFactories,
+    (e) => e.cast<T>(),
+    onError: onError,
+    eagerError: eagerError,
+  );
+}
+
+@Deprecated('Renamed to "wait"')
+final consecList = wait;
+
+@pragma('vm:prefer-inline')
+FutureOr<R> wait<R>(
   Iterable<FutureOr<dynamic>> items,
   _TSyncOrAsyncMapper<Iterable<dynamic>, R> callback, {
   _TOnErrorCallback? onError,
+  bool eagerError = true,
 }) {
-  for (final item in items) {
-    if (item is Future) {
-      return Future.wait(items.map((e) async => await e), eagerError: true)
-          .then((resolvedItems) => callback(resolvedItems))
-          .catchError((Object e, StackTrace? s) {
-            if (onError != null) {
-              return Future.sync(() => onError(e, s)).then((_) => throw e);
-            }
-            throw e;
-          });
+  return waitF(
+    items.map((e) => () => e),
+    callback,
+    onError: onError,
+    eagerError: eagerError,
+  );
+}
+
+FutureOr<R> waitF<R>(
+  Iterable<_TFactory<dynamic>> itemFactories,
+  _TSyncOrAsyncMapper<Iterable<dynamic>, R> callback, {
+  _TOnErrorCallback? onError,
+  bool eagerError = true,
+}) {
+  final buffer = <FutureOr<dynamic>>[];
+  Object? firstSyncError;
+  StackTrace? firstSyncStackTrace;
+  var isFuture = false;
+  for (final itemFactory in itemFactories) {
+    try {
+      if (firstSyncError != null) {
+        itemFactory();
+        continue;
+      }
+
+      final item = itemFactory();
+      buffer.add(item);
+      if (item is Future) {
+        isFuture = true;
+      }
+    } catch (e, s) {
+      if (eagerError) {
+        if (onError != null) {
+          final errorResult = onError(e, s);
+          if (errorResult is Future) {
+            return errorResult.then((_) => _throwError(e, s));
+          }
+        }
+        _throwError(e, s);
+      }
+      firstSyncError ??= e;
+      firstSyncStackTrace ??= s;
     }
   }
-  try {
-    final result = callback(items.cast<dynamic>());
-    if (result is Future<R>) {
-      return result.catchError((Object e, StackTrace? s) {
+  if (firstSyncError != null) {
+    if (onError != null) {
+      final errResult = onError(firstSyncError, firstSyncStackTrace);
+      if (errResult is Future) {
+        return errResult.then((_) => _throwError(firstSyncError!, firstSyncStackTrace));
+      }
+    }
+    _throwError(firstSyncError, firstSyncStackTrace);
+  }
+  if (isFuture) {
+    return Future.wait(
+      buffer.map((e) async => await e),
+      eagerError: eagerError,
+    ).then((items) => callback(items)).catchError(
+      (Object e, StackTrace? s) {
         if (onError != null) {
           return Future.sync(() => onError(e, s)).then((_) => throw e);
         }
         throw e;
-      });
-    }
-    return result;
-  } catch (e, s) {
-    if (onError != null) {
-      final errorResult = onError(e, s);
-      if (errorResult is Future) {
-        return errorResult.then((_) => throw e);
+      },
+    );
+  } else {
+    try {
+      final result = callback(buffer.cast<dynamic>());
+      if (result is Future<R>) {
+        return result.catchError((Object e, StackTrace? s) {
+          if (onError != null) {
+            return Future.sync(() => onError(e, s)).then((_) => throw e);
+          }
+          throw e;
+        });
       }
+      return result;
+    } catch (e, s) {
+      if (onError != null) {
+        final errResult = onError(e, s);
+        if (errResult is Future) return errResult.then((_) => throw e);
+      }
+      rethrow;
     }
-    rethrow;
   }
 }
 
@@ -76,7 +148,7 @@ FutureOr<R> consec<A, R>(
   FutureOr<R> Function(A a) callback, {
   _TOnErrorCallback? onError,
 }) {
-  return consecList<R>(
+  return wait<R>(
     [a],
     (items) => callback(items.elementAt(0) as A),
     onError: onError,
@@ -91,7 +163,7 @@ FutureOr<R> consec2<A, B, R>(
   FutureOr<R> Function(A a, B b) callback, {
   _TOnErrorCallback? onError,
 }) {
-  return consecList<R>(
+  return wait<R>(
     [a, b],
     (items) => callback(items.elementAt(0) as A, items.elementAt(1) as B),
     onError: onError,
@@ -107,7 +179,7 @@ FutureOr<R> consec3<A, B, C, R>(
   FutureOr<R> Function(A a, B b, C c) callback, {
   _TOnErrorCallback? onError,
 }) {
-  return consecList<R>(
+  return wait<R>(
     [a, b, c],
     (items) => callback(
       items.elementAt(0) as A,
@@ -128,7 +200,7 @@ FutureOr<R> consec4<A, B, C, D, R>(
   FutureOr<R> Function(A a, B b, C c, D d) callback, {
   _TOnErrorCallback? onError,
 }) {
-  return consecList<R>(
+  return wait<R>(
     [a, b, c, d],
     (items) => callback(
       items.elementAt(0) as A,
@@ -151,7 +223,7 @@ FutureOr<R> consec5<A, B, C, D, E, R>(
   FutureOr<R> Function(A a, B b, C c, D d, E e) callback, {
   _TOnErrorCallback? onError,
 }) {
-  return consecList<R>(
+  return wait<R>(
     [a, b, c, d, e],
     (items) => callback(
       items.elementAt(0) as A,
@@ -176,7 +248,7 @@ FutureOr<R> consec6<A, B, C, D, E, F, R>(
   FutureOr<R> Function(A a, B b, C c, D d, E e, F f) callback, {
   _TOnErrorCallback? onError,
 }) {
-  return consecList<R>(
+  return wait<R>(
     [a, b, c, d, e, f],
     (items) => callback(
       items.elementAt(0) as A,
@@ -203,7 +275,7 @@ FutureOr<R> consec7<A, B, C, D, E, F, G, R>(
   FutureOr<R> Function(A a, B b, C c, D d, E e, F f, G g) callback, {
   _TOnErrorCallback? onError,
 }) {
-  return consecList<R>(
+  return wait<R>(
     [a, b, c, d, e, f, g],
     (items) => callback(
       items.elementAt(0) as A,
@@ -232,7 +304,7 @@ FutureOr<R> consec8<A, B, C, D, E, F, G, H, R>(
   FutureOr<R> Function(A a, B b, C c, D d, E e, F f, G g, H h) callback, {
   _TOnErrorCallback? onError,
 }) {
-  return consecList<R>(
+  return wait<R>(
     [a, b, c, d, e, f, g, h],
     (items) => callback(
       items.elementAt(0) as A,
@@ -263,7 +335,7 @@ FutureOr<R> consec9<A, B, C, D, E, F, G, H, I, R>(
   FutureOr<R> Function(A a, B b, C c, D d, E e, F f, G g, H h, I i) callback, {
   _TOnErrorCallback? onError,
 }) {
-  return consecList<R>(
+  return wait<R>(
     [a, b, c, d, e, f, g, h, i],
     (items) => callback(
       items.elementAt(0) as A,
@@ -279,3 +351,12 @@ FutureOr<R> consec9<A, B, C, D, E, F, G, H, I, R>(
     onError: onError,
   );
 }
+
+// ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+
+typedef _TFactory<T> = FutureOr<T> Function();
+typedef _TSyncOrAsyncMapper<A, R> = FutureOr<R> Function(A a);
+typedef _TOnErrorCallback = FutureOr<void> Function(Object e, StackTrace? s);
+
+Never _throwError(Object error, [StackTrace? stackTrace]) =>
+    Error.throwWithStackTrace(error, stackTrace ?? StackTrace.current);

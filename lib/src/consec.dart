@@ -25,11 +25,7 @@ FutureOr<Iterable<T>> consecMap<T>(
   Iterable<FutureOr<T>> items, {
   _TOnErrorCallback? onError,
 }) {
-  return consecList(
-    items,
-    (e) => e.cast<T>(),
-    onError: onError,
-  );
+  return consecList(items, (e) => e.cast<T>(), onError: onError);
 }
 
 /// Maps a list containing any mix of synchronous or asynchronous values to a
@@ -44,11 +40,11 @@ FutureOr<R> consecList<R>(
       return Future.wait(items.map((e) async => await e), eagerError: true)
           .then((resolvedItems) => callback(resolvedItems))
           .catchError((Object e, StackTrace? s) {
-        if (onError != null) {
-          return Future.sync(() => onError(e, s)).then((_) => throw e);
-        }
-        throw e;
-      });
+            if (onError != null) {
+              return Future.sync(() => onError(e, s)).then((_) => throw e);
+            }
+            throw e;
+          });
     }
   }
   try {

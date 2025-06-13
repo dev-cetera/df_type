@@ -19,3 +19,4 @@ export './extensions/try_or_null_on_function_extension.dart';
 export './extensions/value_of_on_enum_extension.dart';
 export './utilities/date_time_utility.dart';
 export './utilities/stream_utility.dart';
+export './execute_operations.dart';

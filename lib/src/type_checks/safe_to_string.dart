@@ -14,6 +14,7 @@ String safeToString(Object? obj) {
   try {
     return obj.toString();
   } catch (e) {
+    assert(false, e);
     return '${obj.runtimeType}@${obj.hashCode.toRadixString(16)}';
   }
 }

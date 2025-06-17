@@ -3,16 +3,17 @@
 
 Dart & Flutter Packages by dev-cetera.com & contributors.
 
-[![pub package](https://img.shields.io/pub/v/df_type.svg)](https://pub.dev/packages/df_type)
-[![MIT License](https://img.shields.io/badge/License-MIT-blue.svg)](https://raw.githubusercontent.com/dev-cetera/df_type/main/LICENSE)
+[![pub](https://img.shields.io/pub/v/df_type.svg)](https://pub.dev/packages/df_type)
+[![tag](https://img.shields.io/badge/tag-v0.12.3-purple)](https://github.com/dev-cetera/df_type/tree/v0.12.3)
+[![license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/dev-cetera/df_type/main/LICENSE)
 
 ---
+
+<!-- BEGIN _README_CONTENT -->
 
 ## Summary
 
 This package is designed to simplify and enhance interactions with Dart types. It provides tools for converting between types, checking type properties, and managing synchronous and asynchronous operations.
-
-For a full feature set, please refer to the [API reference](https://pub.dev/documentation/df_type/).
 
 ## Quickstart
 
@@ -86,6 +87,12 @@ void main() async {
 }
 ```
 
+<!-- END _README_CONTENT -->
+
+---
+
+Please refer to the [API reference](https://pub.dev/documentation/df_type/) for more information.
+
 ---
 
 ## Contributing and Discussions
@@ -113,4 +120,5 @@ If you're enjoying this package and find it valuable, consider showing your appr
 
 ## License
 
-This project is released under the MIT License. See [LICENSE](https://raw.githubusercontent.com/dev-cetera/df_type/main/LICENSE) for more information.
+This project is released under the [MIT License](https://raw.githubusercontent.com/dev-cetera/df_type/main/LICENSE). See [LICENSE](https://raw.githubusercontent.com/dev-cetera/df_type/main/LICENSE) for more information.
+

@@ -4,7 +4,7 @@
 Dart & Flutter Packages by dev-cetera.com & contributors.
 
 [![pub](https://img.shields.io/pub/v/df_type.svg)](https://pub.dev/packages/df_type)
-[![tag](https://img.shields.io/badge/tag-v0.12.6-purple)](https://github.com/dev-cetera/df_type/tree/v0.12.6)
+[![tag](https://img.shields.io/badge/tag-v0.12.7-purple)](https://github.com/dev-cetera/df_type/tree/v0.12.7)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/dev-cetera/df_type/main/LICENSE)
 
 ---

@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.12.7]
+
+- Released @ 6/2025 (UTC)
+- Fix newPoller
+
 ## [0.12.6]
 
 - Released @ 6/2025 (UTC)

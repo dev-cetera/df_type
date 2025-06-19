@@ -71,24 +71,42 @@ final class StreamUtility {
   //
 
   /// Creates a [Stream] that polls a [callback] at a specified [interval].
-  Stream<T> newPoller<T>(FutureOr<T> Function() callback, Duration interval) {
-    final controller = StreamController<T>.broadcast();
+  Stream<T> newPoller<T extends Object>(
+    FutureOr<T> Function() callback,
+    Duration interval,
+  ) {
+    final controller = StreamController<T>();
     Timer? timer;
-    FutureOr<void> poll() {
+    void poll() {
+      if (controller.isClosed) return;
       try {
-        consec(callback(), (e) => controller.add(e));
-      } catch (e) {
-        controller.addError(e);
+        consec(callback(), (value) {
+          if (!controller.isClosed) {
+            controller.add(value);
+          }
+        });
+      } catch (e, s) {
+        if (!controller.isClosed) {
+          controller.addError(e, s);
+        }
       }
     }
 
-    controller.onListen = () {
+    void startTimer() {
+      poll();
       timer = Timer.periodic(interval, (_) => poll());
-    };
-    controller.onCancel = () {
+    }
+
+    void stopTimer() {
       timer?.cancel();
-      controller.close();
-    };
+      timer = null;
+    }
+
+    controller
+      ..onListen = startTimer
+      ..onPause = stopTimer
+      ..onResume = startTimer
+      ..onCancel = stopTimer;
     return controller.stream;
   }
 }

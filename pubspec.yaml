@@ -16,7 +16,7 @@ repository: https://github.com/robmllze/df_type
 funding:
   - https://www.buymeacoffee.com/dev_cetera
 description: A package designed to simplify and enhance interactions with Dart types.
-version: 0.12.6
+version: 0.12.7
 topics:
   - data
   - easy-packages

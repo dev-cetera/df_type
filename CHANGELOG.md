@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.12.5]
+
+- Released @ 6/2025 (UTC)
+- Critical bugfix with waitF function
+
 ## [0.12.4]
 
 - Released @ 6/2025 (UTC)

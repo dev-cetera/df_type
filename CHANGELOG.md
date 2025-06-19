@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.12.6]
+
+- Released @ 6/2025 (UTC)
+- Improve StreamUtility
+
 ## [0.12.5]
 
 - Released @ 6/2025 (UTC)

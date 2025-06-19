@@ -12,6 +12,8 @@
 
 import 'dart:async';
 
+import '../consec.dart';
+
 // ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
 
 final class StreamUtility {
@@ -69,13 +71,12 @@ final class StreamUtility {
   //
 
   /// Creates a [Stream] that polls a [callback] at a specified [interval].
-  Stream<T> newPoller<T>(Future<T> Function() callback, Duration interval) {
+  Stream<T> newPoller<T>(FutureOr<T> Function() callback, Duration interval) {
     final controller = StreamController<T>.broadcast();
     Timer? timer;
-    Future<void> poll() async {
+    FutureOr<void> poll() {
       try {
-        final result = await callback();
-        controller.add(result);
+        consec(callback(), (e) => controller.add(e));
       } catch (e) {
         controller.addError(e);
       }

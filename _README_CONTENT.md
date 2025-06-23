@@ -32,9 +32,6 @@ void main() async {
   print(
     "Alphabet.values.valueOf('B'): ${Alphabet.values.valueOf('B')}",
   ); // Alphabet.B
-  print(
-    "letEnumOrNull('active', Status.values): ${letEnumOrNull('active', Status.values)}",
-  ); // Status.active
 
   // --- Deep Get from Nested Data ---
   print('\n*** Deep Get from Nested Data ***');

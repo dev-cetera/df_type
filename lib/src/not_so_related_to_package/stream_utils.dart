@@ -108,17 +108,19 @@ final class StreamUtils {
     Timer? timer;
     void poll() {
       if (controller.isClosed) return;
-      try {
-        consec(callback(), (value) {
+      consec(
+        callback(),
+        (value) {
           if (!controller.isClosed) {
             controller.add(value);
           }
-        });
-      } catch (e, s) {
-        if (!controller.isClosed) {
-          controller.addError(e, s);
-        }
-      }
+        },
+        onError: (e, s) {
+          if (!controller.isClosed) {
+            controller.addError(e, s);
+          }
+        },
+      );
     }
 
     void startTimer() {

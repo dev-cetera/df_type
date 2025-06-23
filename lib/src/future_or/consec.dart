@@ -22,11 +22,15 @@ FutureOr<R> consec<A, R>(
   FutureOr<A> a,
   FutureOr<R> Function(A a) callback, {
   _TOnErrorCallback? onError,
+  bool eagerError = true,
+  _TOnCompleteCallback? onComplete,
 }) {
   return wait<R>(
     [a],
     (items) => callback(items.elementAt(0) as A),
     onError: onError,
+    eagerError: eagerError,
+    onComplete: onComplete,
   );
 }
 
@@ -37,11 +41,15 @@ FutureOr<R> consec2<A, B, R>(
   FutureOr<B> b,
   FutureOr<R> Function(A a, B b) callback, {
   _TOnErrorCallback? onError,
+  bool eagerError = true,
+  _TOnCompleteCallback? onComplete,
 }) {
   return wait<R>(
     [a, b],
     (items) => callback(items.elementAt(0) as A, items.elementAt(1) as B),
     onError: onError,
+    eagerError: eagerError,
+    onComplete: onComplete,
   );
 }
 
@@ -53,6 +61,8 @@ FutureOr<R> consec3<A, B, C, R>(
   FutureOr<C> c,
   FutureOr<R> Function(A a, B b, C c) callback, {
   _TOnErrorCallback? onError,
+  bool eagerError = true,
+  _TOnCompleteCallback? onComplete,
 }) {
   return wait<R>(
     [a, b, c],
@@ -62,6 +72,8 @@ FutureOr<R> consec3<A, B, C, R>(
       items.elementAt(2) as C,
     ),
     onError: onError,
+    eagerError: eagerError,
+    onComplete: onComplete,
   );
 }
 
@@ -74,6 +86,8 @@ FutureOr<R> consec4<A, B, C, D, R>(
   FutureOr<D> d,
   FutureOr<R> Function(A a, B b, C c, D d) callback, {
   _TOnErrorCallback? onError,
+  bool eagerError = true,
+  _TOnCompleteCallback? onComplete,
 }) {
   return wait<R>(
     [a, b, c, d],
@@ -84,6 +98,8 @@ FutureOr<R> consec4<A, B, C, D, R>(
       items.elementAt(3) as D,
     ),
     onError: onError,
+    eagerError: eagerError,
+    onComplete: onComplete,
   );
 }
 
@@ -97,6 +113,8 @@ FutureOr<R> consec5<A, B, C, D, E, R>(
   FutureOr<E> e,
   FutureOr<R> Function(A a, B b, C c, D d, E e) callback, {
   _TOnErrorCallback? onError,
+  bool eagerError = true,
+  _TOnCompleteCallback? onComplete,
 }) {
   return wait<R>(
     [a, b, c, d, e],
@@ -108,6 +126,8 @@ FutureOr<R> consec5<A, B, C, D, E, R>(
       items.elementAt(4) as E,
     ),
     onError: onError,
+    eagerError: eagerError,
+    onComplete: onComplete,
   );
 }
 
@@ -122,6 +142,8 @@ FutureOr<R> consec6<A, B, C, D, E, F, R>(
   FutureOr<F> f,
   FutureOr<R> Function(A a, B b, C c, D d, E e, F f) callback, {
   _TOnErrorCallback? onError,
+  bool eagerError = true,
+  _TOnCompleteCallback? onComplete,
 }) {
   return wait<R>(
     [a, b, c, d, e, f],
@@ -134,6 +156,8 @@ FutureOr<R> consec6<A, B, C, D, E, F, R>(
       items.elementAt(5) as F,
     ),
     onError: onError,
+    eagerError: eagerError,
+    onComplete: onComplete,
   );
 }
 
@@ -149,6 +173,8 @@ FutureOr<R> consec7<A, B, C, D, E, F, G, R>(
   FutureOr<G> g,
   FutureOr<R> Function(A a, B b, C c, D d, E e, F f, G g) callback, {
   _TOnErrorCallback? onError,
+  bool eagerError = true,
+  _TOnCompleteCallback? onComplete,
 }) {
   return wait<R>(
     [a, b, c, d, e, f, g],
@@ -162,6 +188,8 @@ FutureOr<R> consec7<A, B, C, D, E, F, G, R>(
       items.elementAt(6) as G,
     ),
     onError: onError,
+    eagerError: eagerError,
+    onComplete: onComplete,
   );
 }
 
@@ -178,6 +206,8 @@ FutureOr<R> consec8<A, B, C, D, E, F, G, H, R>(
   FutureOr<H> h,
   FutureOr<R> Function(A a, B b, C c, D d, E e, F f, G g, H h) callback, {
   _TOnErrorCallback? onError,
+  bool eagerError = true,
+  _TOnCompleteCallback? onComplete,
 }) {
   return wait<R>(
     [a, b, c, d, e, f, g, h],
@@ -192,6 +222,8 @@ FutureOr<R> consec8<A, B, C, D, E, F, G, H, R>(
       items.elementAt(7) as H,
     ),
     onError: onError,
+    eagerError: eagerError,
+    onComplete: onComplete,
   );
 }
 
@@ -209,6 +241,8 @@ FutureOr<R> consec9<A, B, C, D, E, F, G, H, I, R>(
   FutureOr<I> i,
   FutureOr<R> Function(A a, B b, C c, D d, E e, F f, G g, H h, I i) callback, {
   _TOnErrorCallback? onError,
+  bool eagerError = true,
+  _TOnCompleteCallback? onComplete,
 }) {
   return wait<R>(
     [a, b, c, d, e, f, g, h, i],
@@ -224,9 +258,13 @@ FutureOr<R> consec9<A, B, C, D, E, F, G, H, I, R>(
       items.elementAt(8) as I,
     ),
     onError: onError,
+    eagerError: eagerError,
+    onComplete: onComplete,
   );
 }
 
 // ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
 
 typedef _TOnErrorCallback = FutureOr<void> Function(Object e, StackTrace? s);
+
+typedef _TOnCompleteCallback = FutureOr<void> Function();

@@ -15,7 +15,7 @@ void main() {
       final result = letMapOrNull<String, dynamic>(input);
       expect(result, {
         'user': {'name': 'Alice', 'age': '30'},
-        'active': true
+        'active': true,
       });
     });
 
@@ -43,7 +43,7 @@ void main() {
       final data = {
         1: 'one',
         'list': [0, 1, 2],
-        'map': {1: 'int key', '1': 'string key'}
+        'map': {1: 'int key', '1': 'string key'},
       };
       expect(data.deepGet<String>('1'), isNull); // String '1' not found
       expect(data.deepGetFromSegments<String>([1]), 'one'); // Integer key
@@ -55,12 +55,12 @@ void main() {
       final data = {
         'data': [
           {
-            'values': [10, 20, 30]
+            'values': [10, 20, 30],
           },
           {
-            'values': {'key': 'nested'}
-          }
-        ]
+            'values': {'key': 'nested'},
+          },
+        ],
       };
       expect(data.deepGet<int>('data.0.values.1'), 20);
       expect(data.deepGet<String>('data.1.values.key'), 'nested');
@@ -102,7 +102,11 @@ void main() {
     });
 
     test('DateTimeHelper median', () {
-      final dates = [DateTime(2023, 1, 1), DateTime(2023, 1, 3), DateTime(2023, 1, 2)];
+      final dates = [
+        DateTime(2023, 1, 1),
+        DateTime(2023, 1, 3),
+        DateTime(2023, 1, 2),
+      ];
       final result = DateTimeHelper.i.median(dates);
       expect(result, DateTime(2023, 1, 2));
     });
@@ -111,7 +115,7 @@ void main() {
       final converter = StringToDurationConverter('01:02:03.456');
       expect(
         converter.toDurationOrNull(),
-        Duration(hours: 1, minutes: 2, seconds: 3, milliseconds: 456),
+        const Duration(hours: 1, minutes: 2, seconds: 3, milliseconds: 456),
       );
     });
   });

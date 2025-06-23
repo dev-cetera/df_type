@@ -94,15 +94,8 @@ extension DeepGetOnMapExtension on Map<dynamic, dynamic> {
   /// dot-separated [path].
   ///
   /// This is a convenience wrapper around [deepGetFromSegments].
-  T? deepGet<T>(
-    String path, {
-    String separator = '.',
-  }) {
-    return _deepGet(
-      this,
-      path,
-      separator: separator,
-    );
+  T? deepGet<T>(String path, {String separator = '.'}) {
+    return _deepGet(this, path, separator: separator);
   }
 
   /// Safely retrieves and converts a value from a nested data structure using a
@@ -136,10 +129,7 @@ extension DeepGetOnMapExtension on Map<dynamic, dynamic> {
   /// ```
   /// {@end-tool}
   T? deepGetFromSegments<T>(Iterable<dynamic> pathSegments) {
-    return _deepGetFromSegments(
-      this,
-      pathSegments,
-    );
+    return _deepGetFromSegments(this, pathSegments);
   }
 }
 

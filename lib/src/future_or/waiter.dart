@@ -55,8 +55,8 @@ class Waiter<T> {
   Waiter({
     _TOnErrorCallback? onError,
     List<_TOperation<T>> operations = const [],
-  })  : _onError = onError,
-        _operations = [...operations];
+  }) : _onError = onError,
+       _operations = [...operations];
 
   /// Adds a deferred operation to the queue.
   void add(_TOperation<T> operation) {

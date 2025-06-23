@@ -17,10 +17,11 @@ extension TryOrNullOnFunctionExtension on Function {
   ]) {
     try {
       return Function.apply(
-        this,
-        positionalArguments ?? [],
-        namedArguments ?? {},
-      ) as T?;
+            this,
+            positionalArguments ?? [],
+            namedArguments ?? {},
+          )
+          as T?;
     } catch (_) {
       return null;
     }

@@ -32,12 +32,18 @@ void main() async {
   // --- Type Conversion ---
   print('\n*** Type Conversion Utilities ***');
   print("letIntOrNull('55'): ${letIntOrNull('55')}"); // 55
-  print("letMapOrNull from JSON: ${letMapOrNull<String, dynamic>('{"a": 1}')}"); // {a: 1}
-  print("letListOrNull from CSV: ${letListOrNull<int>('1, 2, 3')}"); // [1, 2, 3]
+  print(
+    "letMapOrNull from JSON: ${letMapOrNull<String, dynamic>('{"a": 1}')}",
+  ); // {a: 1}
+  print(
+    "letListOrNull from CSV: ${letListOrNull<int>('1, 2, 3')}",
+  ); // [1, 2, 3]
 
   // --- Enum Helpers ---
   print('\n*** Enum Helpers ***');
-  print("Alphabet.values.valueOf('B'): ${Alphabet.values.valueOf('B')}"); // Alphabet.B
+  print(
+    "Alphabet.values.valueOf('B'): ${Alphabet.values.valueOf('B')}",
+  ); // Alphabet.B
   print(
     "letEnumOrNull('active', Status.values): ${letEnumOrNull('active', Status.values)}",
   ); // Status.active
@@ -51,9 +57,13 @@ void main() async {
     ],
     '2': 'numeric key',
   };
-  print("deepGet 'users.1.name': ${data.deepGet<String>('users.1.name')}"); // Bob
+  print(
+    "deepGet 'users.1.name': ${data.deepGet<String>('users.1.name')}",
+  ); // Bob
   print("deepGet '2': ${data.deepGet<String>('2')}"); // numeric key
-  print("deepGet 'users.2.name': ${data.deepGet<String>('users.2.name')}"); // null
+  print(
+    "deepGet 'users.2.name': ${data.deepGet<String>('users.2.name')}",
+  ); // null
 
   // --- Function and FutureOr Extensions ---
   print('\n*** Function and FutureOr Extensions ***');

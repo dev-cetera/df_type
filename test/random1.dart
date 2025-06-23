@@ -147,7 +147,10 @@ void main() {
     });
 
     test('deepGetFromSegments should retrieve from segment list', () {
-      expect(testData.deepGetFromSegments<String>(['user', 'roles', 0]), 'admin');
+      expect(
+        testData.deepGetFromSegments<String>(['user', 'roles', 0]),
+        'admin',
+      );
       expect(testData.deepGetFromSegments<int>(['posts', 1, 'id']), 2);
     });
   });
@@ -227,7 +230,10 @@ void main() {
         waiter.add(op1 as FutureOr<int> Function());
         expect(waiter.operations, hasLength(1));
 
-        waiter.addAll([op2 as FutureOr<int> Function(), op3 as FutureOr<int> Function()]);
+        waiter.addAll([
+          op2 as FutureOr<int> Function(),
+          op3 as FutureOr<int> Function(),
+        ]);
         expect(waiter.operations, hasLength(3));
 
         waiter.remove(op2);
@@ -238,7 +244,7 @@ void main() {
       });
 
       test('should call onError callbacks on failure', () async {
-        int errorCount = 0;
+        var errorCount = 0;
         final waiter = Waiter<int>(onError: (e, s) => errorCount++);
         waiter.add(() => throw Exception('test error'));
 

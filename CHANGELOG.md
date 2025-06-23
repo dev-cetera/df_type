@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.13.0]
+
+- Released @ 6/2025 (UTC)
+- breaking: Add tests and features and remove unrelated code
+
 ## [0.12.7]
 
 - Released @ 6/2025 (UTC)

@@ -151,14 +151,17 @@ Map<K, V>? letMapOrNull<K, V>(
     if (decoded is Map) {
       final temp = decoded.entries.map((entry) {
         final convertedKey = letOrNull<K>(entry.key);
-        final convertedValue = letOrNull<V>(entry.value) ?? letOrNull<V?>(nullFallback);
+        final convertedValue =
+            letOrNull<V>(entry.value) ?? letOrNull<V?>(nullFallback);
         if (filterNulls) {
           if (!isNullable<K>() && convertedKey == null) return const _Empty();
           if (!isNullable<V>() && convertedValue == null) return const _Empty();
         }
         return MapEntry(convertedKey as K, convertedValue as V);
       });
-      final filtered = temp.where((e) => e != const _Empty()).cast<MapEntry<K, V>>();
+      final filtered = temp
+          .where((e) => e != const _Empty())
+          .cast<MapEntry<K, V>>();
       return Map.fromEntries(filtered);
     }
   } catch (_) {}

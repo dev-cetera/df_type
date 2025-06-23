@@ -56,7 +56,8 @@ FutureOr<R> wait<R>(
 }) {
   return waitF(
     items.map(
-      (e) => () => e,
+      (e) =>
+          () => e,
     ),
     callback,
     onError: onError,
@@ -125,30 +126,32 @@ FutureOr<R> waitF<R>(
     }
   } else {
     return Future.wait(
-      buffer.map((e) => Future.value(e)),
-      eagerError: eagerError,
-    ).then((items) {
-      if (firstSyncError != null) {
-        if (onError != null) {
-          final errResult = onError(firstSyncError, firstSyncStackTrace);
-          if (errResult is Future) {
-            return errResult.then(
-              (_) => _throwError(firstSyncError!, firstSyncStackTrace),
-            );
+          buffer.map((e) => Future.value(e)),
+          eagerError: eagerError,
+        )
+        .then((items) {
+          if (firstSyncError != null) {
+            if (onError != null) {
+              final errResult = onError(firstSyncError, firstSyncStackTrace);
+              if (errResult is Future) {
+                return errResult.then(
+                  (_) => _throwError(firstSyncError!, firstSyncStackTrace),
+                );
+              }
+            }
+            _throwError(firstSyncError, firstSyncStackTrace);
           }
-        }
-        _throwError(firstSyncError, firstSyncStackTrace);
-      }
-      return callback(items);
-    }).catchError((Object e, StackTrace? s) {
-      if (onError != null) {
-        final errResult = onError(e, s);
-        if (errResult is Future) {
-          return errResult.then((_) => throw e);
-        }
-      }
-      throw e;
-    });
+          return callback(items);
+        })
+        .catchError((Object e, StackTrace? s) {
+          if (onError != null) {
+            final errResult = onError(e, s);
+            if (errResult is Future) {
+              return errResult.then((_) => throw e);
+            }
+          }
+          throw e;
+        });
   }
 }
 

@@ -66,7 +66,8 @@ FutureOr<R> wait<R>(
 }) {
   return waitF(
     items.map(
-      (e) => () => e,
+      (e) =>
+          () => e,
     ),
     callback,
     onError: onError,
@@ -200,7 +201,8 @@ Future<R> _futureWait<R>(
   );
   return Future.wait(bufferAndErrors)
       .then(
-        (valuesAndErrors) => _processItems(syncError1, valuesAndErrors, callback, onError),
+        (valuesAndErrors) =>
+            _processItems(syncError1, valuesAndErrors, callback, onError),
       )
       .whenComplete(onComplete ?? () {});
 }

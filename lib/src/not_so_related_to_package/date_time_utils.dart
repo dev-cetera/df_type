@@ -91,7 +91,8 @@ final class DateTimeUtils {
     if (filteredDates.length.isOdd) {
       return filteredDates[middleIndex];
     } else {
-      final medianMs = (filteredDates[middleIndex - 1].millisecondsSinceEpoch +
+      final medianMs =
+          (filteredDates[middleIndex - 1].millisecondsSinceEpoch +
               filteredDates[middleIndex].millisecondsSinceEpoch) ~/
           2;
       return DateTime.fromMillisecondsSinceEpoch(medianMs);

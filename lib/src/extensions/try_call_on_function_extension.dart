@@ -56,10 +56,11 @@ extension $TryCallOnFunctionExtension on Function {
       // Function.apply expects List<dynamic>, so we pass the args as-is.
       // The generic <A> provides compile-time checking for the caller.
       return Function.apply(
-        this,
-        positionalArguments ?? [],
-        namedArguments ?? {},
-      ) as T?;
+            this,
+            positionalArguments ?? [],
+            namedArguments ?? {},
+          )
+          as T?;
     } catch (_) {
       // Catches any exception during invocation (e.g., wrong argument types,
       // internal errors) and returns null.

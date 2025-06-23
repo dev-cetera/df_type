@@ -68,7 +68,7 @@ void main() async {
   // --- Function and FutureOr Extensions ---
   print('\n*** Function and FutureOr Extensions ***');
   int Function(int) addOne = (i) => i + 1;
-  print('Function.tryOrNull: ${addOne.tryOrNull<int>([5])}'); // 6
+  print('Function.tryCall: ${addOne.tryCall<int, int>([5])}'); // 6
 
   FutureOr<int> futureOrValue = Future.value(10);
   print('futureOrValue.isFuture: ${futureOrValue.isFuture}'); // true

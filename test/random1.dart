@@ -156,22 +156,22 @@ void main() {
   });
 
   group('Extension Methods', () {
-    test('ValueOfOnEnumExtension should find enum by name', () {
+    test('\$ValueOfOnEnumExtension should find enum by name', () {
       expect(AnotherEnum.values.valueOf('alpha'), AnotherEnum.alpha);
       expect(AnotherEnum.values.valueOf('BETA'), AnotherEnum.beta);
       expect(AnotherEnum.values.valueOf('gamma'), isNull);
     });
 
-    test('TryOrNullOnFunctionExtension should execute safely', () {
+    test('\$TryCallOnFunctionExtension should execute safely', () {
       int parseInt(String s) => int.parse(s);
       int throws() => throw Exception();
 
-      expect(parseInt.tryOrNull<int>(['123']), 123);
-      expect(parseInt.tryOrNull<int>(['abc']), isNull);
-      expect(throws.tryOrNull<int>([]), isNull);
+      expect(parseInt.tryCall<int, String>(['123']), 123);
+      expect(parseInt.tryCall<int, String>(['abc']), isNull);
+      expect(throws.tryCall<int, dynamic>([]), isNull);
     });
 
-    test('FutureOrExtension should work correctly', () {
+    test('\$FutureOrExtension should work correctly', () {
       FutureOr<int> val = 10;
       FutureOr<int> fut = Future.value(20);
 

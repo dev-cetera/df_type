@@ -16,6 +16,7 @@ import 'dart:async' show FutureOr;
 
 // ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
 
+/// Waits for a list of [FutureOr] values and returns them as an [Iterable].
 @pragma('vm:prefer-inline')
 FutureOr<Iterable<T>> waitAlike<T>(
   Iterable<FutureOr<T>> items, {
@@ -30,6 +31,7 @@ FutureOr<Iterable<T>> waitAlike<T>(
   );
 }
 
+/// Executes deferred operations and returns the results as an [Iterable].
 @pragma('vm:prefer-inline')
 FutureOr<Iterable<T>> waitAlikeF<T>(
   Iterable<_TFactory<dynamic>> itemFactories, {
@@ -47,6 +49,7 @@ FutureOr<Iterable<T>> waitAlikeF<T>(
 @Deprecated('Renamed to "wait"')
 final consecList = wait;
 
+/// Waits for a list of [FutureOr] values and transforms the results.
 @pragma('vm:prefer-inline')
 FutureOr<R> wait<R>(
   Iterable<FutureOr<dynamic>> items,
@@ -56,8 +59,7 @@ FutureOr<R> wait<R>(
 }) {
   return waitF(
     items.map(
-      (e) =>
-          () => e,
+      (e) => () => e,
     ),
     callback,
     onError: onError,
@@ -65,6 +67,7 @@ FutureOr<R> wait<R>(
   );
 }
 
+/// Executes deferred operations and transforms the results via a callback.
 FutureOr<R> waitF<R>(
   Iterable<_TFactory<dynamic>> itemFactories,
   _TSyncOrAsyncMapper<Iterable<dynamic>, R> callback, {
@@ -126,40 +129,43 @@ FutureOr<R> waitF<R>(
     }
   } else {
     return Future.wait(
-          buffer.map((e) => Future.value(e)),
-          eagerError: eagerError,
-        )
-        .then((items) {
-          if (firstSyncError != null) {
-            if (onError != null) {
-              final errResult = onError(firstSyncError, firstSyncStackTrace);
-              if (errResult is Future) {
-                return errResult.then(
-                  (_) => _throwError(firstSyncError!, firstSyncStackTrace),
-                );
-              }
-            }
-            _throwError(firstSyncError, firstSyncStackTrace);
+      buffer.map((e) => Future.value(e)),
+      eagerError: eagerError,
+    ).then((items) {
+      if (firstSyncError != null) {
+        if (onError != null) {
+          final errResult = onError(firstSyncError, firstSyncStackTrace);
+          if (errResult is Future) {
+            return errResult.then(
+              (_) => _throwError(firstSyncError!, firstSyncStackTrace),
+            );
           }
-          return callback(items);
-        })
-        .catchError((Object e, StackTrace? s) {
-          if (onError != null) {
-            final errResult = onError(e, s);
-            if (errResult is Future) {
-              return errResult.then((_) => throw e);
-            }
-          }
-          throw e;
-        });
+        }
+        _throwError(firstSyncError, firstSyncStackTrace);
+      }
+      return callback(items);
+    }).catchError((Object e, StackTrace? s) {
+      if (onError != null) {
+        final errResult = onError(e, s);
+        if (errResult is Future) {
+          return errResult.then((_) => throw e);
+        }
+      }
+      throw e;
+    });
   }
 }
 
 // ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
 
 typedef _TFactory<T> = FutureOr<T> Function();
+
 typedef _TSyncOrAsyncMapper<A, R> = FutureOr<R> Function(A a);
+
 typedef _TOnErrorCallback = FutureOr<void> Function(Object e, StackTrace? s);
 
-Never _throwError(Object error, [StackTrace? stackTrace]) =>
-    Error.throwWithStackTrace(error, stackTrace ?? StackTrace.current);
+/// Internal helper to rethrow an error with its stack trace.
+@pragma('vm:prefer-inline')
+Never _throwError(Object error, [StackTrace? stackTrace]) {
+  Error.throwWithStackTrace(error, stackTrace ?? StackTrace.current);
+}

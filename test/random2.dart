@@ -98,16 +98,16 @@ void main() {
   group('Deprecated Utilities', () {
     test('StreamHelper firstToFuture', () async {
       final stream = Stream.fromIterable([1, 2, 3]);
-      expect(await StreamHelper.i.firstToFuture(stream), 1);
+      expect(await StreamUtils.i.firstToFuture(stream), 1);
     });
 
-    test('DateTimeHelper median', () {
+    test('DateTimeUtils median', () {
       final dates = [
         DateTime(2023, 1, 1),
         DateTime(2023, 1, 3),
         DateTime(2023, 1, 2),
       ];
-      final result = DateTimeHelper.i.median(dates);
+      final result = DateTimeUtils.i.median(dates);
       expect(result, DateTime(2023, 1, 2));
     });
 

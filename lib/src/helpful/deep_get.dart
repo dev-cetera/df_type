@@ -89,7 +89,7 @@ T? deepGetFromSegments<T>(
 
 // ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
 
-extension DeepGetOnMapExtension on Map<dynamic, dynamic> {
+extension $DeepGetOnMapExtension on Map<dynamic, dynamic> {
   /// Safely retrieves and converts a value from a nested data structure using a
   /// dot-separated [path].
   ///

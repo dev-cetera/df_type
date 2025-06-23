@@ -12,22 +12,32 @@
 
 import 'package:collection/collection.dart';
 
-// ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-
-extension ValueOfOnEnumExtension<T extends Enum> on Iterable<T> {
-  /// Returns the first element or `null` if there are none.
+/// Provides a safe, string-based lookup method for enum iterables.
+extension $ValueOfOnEnumExtension<T extends Enum> on Iterable<T> {
+  /// Returns the enum value from this iterable that matches the given string [value].
   ///
-  /// **Example:**
+  /// The comparison is case-insensitive. Returns `null` if no match is found.
+  /// This is commonly used with `MyEnum.values`.
   ///
+  /// {@tool snippet}
   /// ```dart
-  /// enum ExampleEnum { a, b, c }
-  /// final value = ExampleEnum.values.valueOf('b');
-  /// print(ExampleEnum.b == value); // true
+  /// enum Status { pending, active, done }
+  ///
+  /// void main() {
+  ///   // Successful lookup (case-insensitive)
+  ///   final status = Status.values.valueOf('ACTIVE');
+  ///   print(status); // Prints: Status.active
+  ///
+  ///   // Failed lookup
+  ///   final unknown = Status.values.valueOf('archived');
+  ///   print(unknown); // Prints: null
+  /// }
   /// ```
+  /// {@end-tool}
   @pragma('vm:prefer-inline')
   T? valueOf(String? value) {
     return firstWhereOrNull(
-      (type) => type.name.toLowerCase() == value?.toLowerCase(),
+      (type) => type.name.toLowerCase() == value?.toLowerCase().trim(),
     );
   }
 }

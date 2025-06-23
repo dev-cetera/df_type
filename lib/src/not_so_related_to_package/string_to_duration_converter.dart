@@ -10,29 +10,42 @@
 // ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
 //.title~
 
+/// A utility to safely parse a string into a [Duration].
+///
+/// This class handles various time formats commonly used to represent durations,
+/// such as `HH:MM:SS`. It is used by creating an instance with the input
+/// string and then calling the [toDurationOrNull] method.
+///
+/// {@tool snippet}
+/// ```dart
+/// final duration = const StringToDurationConverter('01:30:45').toDurationOrNull();
+/// print(duration); // Prints: 1:30:45.000000
+///
+/// final invalid = const StringToDurationConverter('not a duration').toDurationOrNull();
+/// print(invalid); // Prints: null
+/// ```
+/// {@end-tool}
 @Deprecated('May be removed from package in the future!')
 class StringToDurationConverter {
-  //
-  //
-  //
-
+  /// The string to be converted into a [Duration].
   final String? input;
 
-  //
-  //
-  //
-
+  /// Creates a converter for the given string [input].
   const StringToDurationConverter(this.input);
 
-  //
-  //
-  //
-
-  /// Tries to convert the [input] to a [Duration]. Accepts formats like
-  /// `HH`, `HH:MM`, `HH:MM:SS`, and `HH:MM:SS.SSS`. Any components not specified
-  /// are set to 0.
+  /// Tries to convert the stored `input` string to a [Duration].
   ///
-  /// Returns `null` if the conversion fails.
+  /// This method supports the following formats:
+  /// - `HH:MM:SS.mmm` (e.g., '01:23:45.678')
+  /// - `HH:MM:SS` (e.g., '01:23:45')
+  /// - `HH:MM` (e.g., '01:23')
+  /// - `HH` (e.g., '1' or '01')
+  /// - `SS.mmm` (e.g., '45.678', when a single decimal value is provided)
+  ///
+  /// Components not provided in the string (like seconds or minutes) default to 0.
+  ///
+  /// Returns `null` if the input string is empty, null, or does not match any
+  /// of the supported formats.
   Duration? toDurationOrNull() {
     if (input == null || input!.isEmpty) return null;
     final parts = input!.trim().split(':');

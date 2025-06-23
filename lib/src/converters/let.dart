@@ -101,12 +101,8 @@ double? letDoubleOrNull(dynamic input) => letNumOrNull(input)?.toDouble();
 bool? letBoolOrNull(dynamic input) {
   if (input is bool) return input;
   if (input is String) {
-    final normalized = input.trim().toLowerCase();
-    if (normalized == 'true') return true;
-    if (normalized == 'false') return false;
+    return bool.tryParse(input.trim(), caseSensitive: false);
   }
-  // Note: Does not convert from num (e.g., 1 or 0) to avoid ambiguity.
-  // Use `letNumOrNull(input) == 1` for that behavior.
   return null;
 }
 
@@ -151,17 +147,14 @@ Map<K, V>? letMapOrNull<K, V>(
     if (decoded is Map) {
       final temp = decoded.entries.map((entry) {
         final convertedKey = letOrNull<K>(entry.key);
-        final convertedValue =
-            letOrNull<V>(entry.value) ?? letOrNull<V?>(nullFallback);
+        final convertedValue = letOrNull<V>(entry.value) ?? letOrNull<V?>(nullFallback);
         if (filterNulls) {
           if (!isNullable<K>() && convertedKey == null) return const _Empty();
           if (!isNullable<V>() && convertedValue == null) return const _Empty();
         }
         return MapEntry(convertedKey as K, convertedValue as V);
       });
-      final filtered = temp
-          .where((e) => e != const _Empty())
-          .cast<MapEntry<K, V>>();
+      final filtered = temp.where((e) => e != const _Empty()).cast<MapEntry<K, V>>();
       return Map.fromEntries(filtered);
     }
   } catch (_) {}

@@ -313,7 +313,7 @@
 - Released @ 1/2025 (UTC)
 - docs: Update readme and doc comments code for clarity and consistency
 - chore: Update release date format in changelog
-- feat: Add ValueOfOnEnumExtension to alow Strings to be converted to Enums
+- feat: Add $ValueOfOnEnumExtension to alow Strings to be converted to Enums
 
 ## [0.1.0]
 

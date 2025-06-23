@@ -206,7 +206,7 @@ void main() {
         final result = await consec2(
           10,
           Future.value('a'),
-          (num, str) => '$str$num',
+          (num1, str1) => '$str1$num1',
         );
         expect(result, 'a10');
       });

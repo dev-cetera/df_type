@@ -112,7 +112,7 @@ void main() {
     });
 
     test('StringToDurationConverter with milliseconds', () {
-      final converter = StringToDurationConverter('01:02:03.456');
+      final converter = const StringToDurationConverter('01:02:03.456');
       expect(
         converter.toDurationOrNull(),
         const Duration(hours: 1, minutes: 2, seconds: 3, milliseconds: 456),

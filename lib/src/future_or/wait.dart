@@ -65,7 +65,10 @@ FutureOr<R> wait<R>(
   _TOnCompleteCallback? onComplete,
 }) {
   return waitF(
-    items.map((e) => () => e),
+    items.map(
+      (e) =>
+          () => e,
+    ),
     callback,
     onError: onError,
     eagerError: eagerError,
@@ -93,7 +96,8 @@ FutureOr<R> waitF<R>(
         syncBuffer.add(item);
       }
     } catch (e, s) {
-      if (eagerError) return _handleErrorAndComplete(_Error(e, s), onError, onComplete);
+      if (eagerError)
+        return _handleErrorAndComplete(_Error(e, s), onError, onComplete);
       if (syncError1 == null) {
         syncError1 = _Error(e, s);
         asyncBuffer.add(Future.error(e, s));
@@ -131,22 +135,14 @@ FutureOr<R> _handleSyncPath<R>(
 ) {
   try {
     if (syncError1 != null) {
-      return _handleErrorAndComplete(
-        syncError1,
-        onError,
-        onComplete,
-      );
+      return _handleErrorAndComplete(syncError1, onError, onComplete);
     }
     final result = callback(syncBuffer);
     if (result is Future<R>) return result.whenComplete(onComplete ?? () {});
     onComplete?.call();
     return result;
   } catch (e, s) {
-    return _handleErrorAndComplete(
-      _Error(e, s),
-      onError,
-      onComplete,
-    );
+    return _handleErrorAndComplete(_Error(e, s), onError, onComplete);
   }
 }
 
@@ -159,10 +155,7 @@ FutureOr<R> _handleAsyncPath<R>(
   _TOnErrorCallback? onError,
   _TOnCompleteCallback? onComplete,
 ) {
-  final buffer = [
-    ...syncBuffer.map((e) => Future.value(e)),
-    ...asyncBuffer,
-  ];
+  final buffer = [...syncBuffer.map((e) => Future.value(e)), ...asyncBuffer];
   if (eagerError) {
     return _futureWaitEagerError(
       buffer,
@@ -189,7 +182,9 @@ Future<R> _futureWaitEagerError<R>(
 }) {
   return Future.wait(buffer, eagerError: true)
       .then((values) => Future.value(callback(values)))
-      .catchError((Object e, StackTrace? s) => _handleError<R>(_Error(e, s), onError))
+      .catchError(
+        (Object e, StackTrace? s) => _handleError<R>(_Error(e, s), onError),
+      )
       .whenComplete(onComplete ?? () {});
 }
 
@@ -200,10 +195,14 @@ Future<R> _futureWait<R>(
   _TOnErrorCallback? onError,
   _TOnCompleteCallback? onComplete,
 }) {
-  final bufferAndErrors =
-      buffer.map((e) => e.catchError((Object e, StackTrace? s) => _Error(e, s)));
+  final bufferAndErrors = buffer.map(
+    (e) => e.catchError((Object e, StackTrace? s) => _Error(e, s)),
+  );
   return Future.wait(bufferAndErrors)
-      .then((valuesAndErrors) => _processItems(syncError1, valuesAndErrors, callback, onError))
+      .then(
+        (valuesAndErrors) =>
+            _processItems(syncError1, valuesAndErrors, callback, onError),
+      )
       .whenComplete(onComplete ?? () {});
 }
 
@@ -223,10 +222,7 @@ Future<R> _processItems<R>(
   return Future.value(callback(valusAndErrors.where((e) => e is! _Error)));
 }
 
-FutureOr<R> _handleError<R>(
-  _Error error,
-  _TOnErrorCallback? onError,
-) {
+FutureOr<R> _handleError<R>(_Error error, _TOnErrorCallback? onError) {
   FutureOr<void>? errorResult;
   try {
     errorResult = onError?.call(error.e, error.s);

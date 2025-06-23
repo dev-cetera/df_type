@@ -29,15 +29,15 @@ import '../_src.g.dart';
 /// - [List]  (dynamic)
 /// - [Set] (dynamic)
 /// - [Map] (dynamic, dynamic)
-Map<K, V>? letMapOrNull<K, V>(
-  dynamic input,
-) {
+Map<K, V>? letMapOrNull<K, V>(dynamic input) {
   return switch (input) {
     final Map<dynamic, dynamic> m => _convertMapOrNull<K, V>(m),
-    final String s => switch (jsonDecodeOrNull<Map<dynamic, dynamic>>(s.trim())) {
-        final Map<dynamic, dynamic> d => _convertMapOrNull<K, V>(d),
-        _ => null,
-      },
+    final String s => switch (jsonDecodeOrNull<Map<dynamic, dynamic>>(
+      s.trim(),
+    )) {
+      final Map<dynamic, dynamic> d => _convertMapOrNull<K, V>(d),
+      _ => null,
+    },
     _ => null,
   };
 }

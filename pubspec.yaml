@@ -15,7 +15,7 @@ homepage: https://dev-cetera.com/
 repository: https://github.com/robmllze/df_type
 funding:
   - https://www.buymeacoffee.com/dev_cetera
-description: A versatile package that simplifies type conversions, inspections, nested data access, and sync/async operations.
+description: Simplifies type conversions, inspections, nested data access, sync/async operations and more.
 version: 0.13.0
 topics:
   - data

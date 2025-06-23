@@ -13,7 +13,7 @@ Dart & Flutter Packages by dev-cetera.com & contributors.
 
 ## Summary
 
-A versatile package that simplifies type conversions, inspections, nested data access, and sync/async operations.
+A versatile package that simplifies type conversions, inspections, nested data access, sync/async operations and more.
 
 ## Quickstart
 
@@ -89,7 +89,6 @@ void main() async {
   print('Waiter results: $waiterResults'); // (Task 1, Task 2)
 }
 ```
-
 
 <!-- END _README_CONTENT -->
 

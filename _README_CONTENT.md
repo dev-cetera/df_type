@@ -1,6 +1,6 @@
 ## Summary
 
-A versatile package that simplifies type conversions, inspections, nested data access, and sync/async operations.
+A versatile package that simplifies type conversions, inspections, nested data access, sync/async operations and more.
 
 ## Quickstart
 

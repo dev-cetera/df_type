@@ -66,8 +66,7 @@ FutureOr<R> wait<R>(
 }) {
   return waitF(
     items.map(
-      (e) =>
-          () => e,
+      (e) => () => e,
     ),
     callback,
     onError: onError,
@@ -96,8 +95,9 @@ FutureOr<R> waitF<R>(
         syncBuffer.add(item);
       }
     } catch (e, s) {
-      if (eagerError)
+      if (eagerError) {
         return _handleErrorAndComplete(_Error(e, s), onError, onComplete);
+      }
       if (syncError1 == null) {
         syncError1 = _Error(e, s);
         asyncBuffer.add(Future.error(e, s));
@@ -200,8 +200,7 @@ Future<R> _futureWait<R>(
   );
   return Future.wait(bufferAndErrors)
       .then(
-        (valuesAndErrors) =>
-            _processItems(syncError1, valuesAndErrors, callback, onError),
+        (valuesAndErrors) => _processItems(syncError1, valuesAndErrors, callback, onError),
       )
       .whenComplete(onComplete ?? () {});
 }

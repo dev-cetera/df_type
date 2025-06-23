@@ -28,9 +28,11 @@ void main(List<String> args) {
   final sections = extractSections(contents);
   final versionExist = sections.where((e) => e.version == version).isNotEmpty;
   if (versionExist) {
-    sections.where((e) => e.version == version).forEach((e) {
-      e.addUpdate(comitMesssage);
-    });
+    for (final versionSection in sections.where((e) => e.version == version)) {
+      if (comitMesssage.isNotEmpty) {
+        versionSection.addUpdate(comitMesssage);
+      }
+    }
   } else {
     sections.add(
       _VersionSection(
@@ -105,7 +107,7 @@ class _VersionSection {
     required this.version,
     required this.releasedAt,
     Set<String>? updates,
-  }) : this.updates = updates ?? {};
+  }) : updates = updates ?? {};
 
   //
   //

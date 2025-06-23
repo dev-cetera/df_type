@@ -10,8 +10,8 @@
 // ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
 //.title~
 
-/// A tool to convert a string to a [Duration].
-class ConvertStringToDuration {
+@Deprecated('May be removed from package in the future!')
+class StringToDurationConverter {
   //
   //
   //
@@ -22,7 +22,7 @@ class ConvertStringToDuration {
   //
   //
 
-  const ConvertStringToDuration(this.input);
+  const StringToDurationConverter(this.input);
 
   //
   //

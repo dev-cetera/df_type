@@ -10,17 +10,23 @@
 // ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
 //.title~
 
-String safeToString(Object? obj) {
-  try {
-    return obj.toString();
-  } catch (e) {
-    assert(false, e);
-    return '${obj.runtimeType}@${obj.hashCode.toRadixString(16)}';
-  }
-}
+import 'dart:async';
 
-extension SafeToStringOnObjectX on Object {
-  String safeToString() => _safeToString(this);
-}
+// ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
 
-final _safeToString = safeToString;
+extension FutureOrExtension<T> on FutureOr<T> {
+  @pragma('vm:prefer-inline')
+  bool get isFuture => this is Future<T>;
+
+  @pragma('vm:prefer-inline')
+  bool get isNotFuture => !isFuture;
+
+  @pragma('vm:prefer-inline')
+  Future<T>? asFutureOrNull() => isFuture ? this as Future<T> : null;
+
+  @pragma('vm:prefer-inline')
+  Future<T> toFuture() => Future.value(this);
+
+  @pragma('vm:prefer-inline')
+  T? asNonFutureOrNull() => isNotFuture ? this as T : null;
+}

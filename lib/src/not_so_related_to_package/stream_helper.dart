@@ -12,22 +12,23 @@
 
 import 'dart:async';
 
-import '../consec.dart';
+import '../future_or/consec.dart';
 
 // ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
 
-final class StreamUtility {
+@Deprecated('May be removed from package in the future!')
+final class StreamHelper {
   //
   //
   //
 
-  const StreamUtility._();
+  const StreamHelper._();
 
   //
   //
   //
 
-  static final i = const StreamUtility._();
+  static final i = const StreamHelper._();
 
   //
   //

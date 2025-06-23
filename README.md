@@ -10,83 +10,70 @@ Dart & Flutter Packages by dev-cetera.com & contributors.
 ---
 
 <!-- BEGIN _README_CONTENT -->
-
 ## Summary
 
-This package is designed to simplify and enhance interactions with Dart types. It provides tools for converting between types, checking type properties, and managing synchronous and asynchronous operations.
+A versatile package that simplifies type conversions, inspections, nested data access, and sync/async operations.
 
 ## Quickstart
 
 ```dart
+// --- Type Checking ---
+print('\n*** Type Checking Utilities ***');
+print('isNullable<String?>: ${isNullable<String?>()}'); // true
+print('isSubtype<int, num>: ${isSubtype<int, num>()}'); // true
+print('typeEquality<int, int>: ${typeEquality<int, int>()}'); // true
+print('typeEquality<int, String>: ${typeEquality<int, String>()}'); // false
+
+// --- Type Conversion ---
+print('\n*** Type Conversion Utilities ***');
+print("letIntOrNull('55'): ${letIntOrNull('55')}"); // 55
+print("letMapOrNull from JSON: ${letMapOrNull<String, dynamic>('{"a": 1}')}"); // {a: 1}
+print("letListOrNull from CSV: ${letListOrNull<int>('1, 2, 3')}"); // [1, 2, 3]
+
+// --- Enum Helpers ---
+print('\n*** Enum Helpers ***');
 enum Alphabet { A, B, C }
+print("Alphabet.values.valueOf('B'): ${Alphabet.values.valueOf('B')}"); // Alphabet.B
+enum Status { pending, active, done }
+print(
+  "letEnumOrNull('active', Status.values): ${letEnumOrNull('active', Status.values)}",
+); // Status.active
 
-void main() async {
-  print('Convert a String to an enum:\n');
-  print(Alphabet.values.valueOf('A') == Alphabet.A); // true
-  print(Alphabet.values.valueOf('a') == Alphabet.A); // true
-  print(Alphabet.values.valueOf('b')); // Alphabet.B
-  print(Alphabet.values.valueOf('qwerty') == null); // true
+// --- Deep Get from Nested Data ---
+print('\n*** Deep Get from Nested Data ***');
+final data = {
+  'users': [
+    {'name': 'Alice'},
+    {'name': 'Bob'},
+  ],
+  '2': 'numeric key',
+};
+print("deepGet 'users.1.name': ${data.deepGet<String>('users.1.name')}"); // Bob
+print("deepGet '2': ${data.deepGet<String>('2')}"); // numeric key
+print("deepGet 'users.2.name': ${data.deepGet<String>('users.2.name')}"); // null
 
-  print('\n*** Check if a type is nullable:\n');
-  print(isNullable<String>()); // false
-  print(isNullable<String?>()); // true
-  print(isNullable<Null>()); // true
+// --- Function and FutureOr Extensions ---
+print('\n*** Function and FutureOr Extensions ***');
+int Function(int) addOne = (i) => i + 1;
+print('Function.tryOrNull: ${addOne.tryOrNull<int>([5])}'); // 6
 
-  print('\n*** Check if a type a subtype of another::\n');
-  print(isSubtype<int, num>()); // true
-  print(isSubtype<num, int>()); // false
-  print(isSubtype<Future<int>, Future<dynamic>>()); // true
-  print(isSubtype<Future<dynamic>, Future<int>>()); // false
-  print(isSubtype<int Function(int), Function>()); // true
-  print(isSubtype<Function, int Function(int)>()); // false
+FutureOr<int> futureOrValue = Future.value(10);
+print('futureOrValue.isFuture: ${futureOrValue.isFuture}'); // true
+print('futureOrValue.toFuture(): ${await futureOrValue.toFuture()}'); // 10
 
-  print('\n*** Check if a type can be compared by value:\n');
-  print(isEquatable<double>()); // true
-  print(isEquatable<Null>()); // true
-  print(isEquatable<Map<dynamic, dynamic>>()); // false
-  print(isEquatable<Equatable>()); // true
+// --- Asynchronous Helpers ---
+print('\n*** Asynchronous Helpers ***');
+// `consec` for handling a mix of sync/async values
+final result = await consec(Future.value(5), (val) => val * 2);
+print('consec result: $result'); // 10
 
-  print('\n*** Only let a value be of a certain type, or return null:\n');
-  print(letAsOrNull<String>(DateTime.now())); // null
-  print(letAsOrNull<DateTime>(DateTime.now())); // returns the value
-  print(letAsOrNull<DateTime?>(DateTime.now())); // returns the value
-  print(letAsOrNull<DateTime?>(null)); // null
-
-  print('\n*** Lazy-convert types to an int or return null:\n');
-  final int? i = letIntOrNull('55');
-  print(i); // 55
-
-  print('\n*** Lazy-convert maps from one type to another or return null:\n');
-  final Map<String, int>? m = letMapOrNull<String, int>({55: '56'});
-  print(m); // {55, 56}
-
-  print('\n*** Lazy-convert lists or return null:\n');
-  print(letListOrNull<int>('1, 2, 3, 4')); // [1, 2, 3, 4]
-  print(letListOrNull<int>('[1, 2, 3, 4]')); // [1, 2, 3, 4]
-  print(letListOrNull<int>([1, 2, 3, 4])); // [1, 2, 3, 4]
-  print(letListOrNull<int>(1)); // [1]
-
-  print('\n*** Lazy-convert to double or return null:\n');
-  print(letOrNull<double>('123')); // 123.0
-
-  print('\n*** Convert a String to a Duration:\n');
-  final Duration? duration = const ConvertStringToDuration(
-    '11:11:00.00',
-  ).toDurationOrNull();
-  print(duration); // 11:11:00.000000
-
-  print('\n*** Use consec with FutureOr:\n');
-  print(consec(1, (prev) => prev + 1)); // 2
-  FutureOr<double> pi = 3.14159;
-  final doublePi = consec(pi, (prev) => prev * 2);
-  print(doublePi); // 6.2832
-  FutureOr<double> e = Future.value(2.71828);
-  final doubleE = consec(e, (prev) => prev * 2);
-  print(doubleE); // Instance of 'Future<double>'
-  print(await doubleE); // 5.43656
-}
+// `Waiter` for deferred, batched execution
+final taskQueue = Waiter<String>();
+taskQueue.add(() => 'Task 1');
+taskQueue.add(() async => 'Task 2');
+final waiterResults = await taskQueue.wait();
+print('Waiter results: $waiterResults'); // (Task 1, Task 2)
 ```
-
 <!-- END _README_CONTENT -->
 
 ---

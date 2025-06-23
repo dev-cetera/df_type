@@ -10,18 +10,19 @@
 // ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
 //.title~
 
-final class DateTimeUtility {
+@Deprecated('May be removed from package in the future!')
+final class DateTimeHelper {
   //
   //
   //
 
-  const DateTimeUtility._();
+  const DateTimeHelper._();
 
   //
   //
   //
 
-  static final i = const DateTimeUtility._();
+  static final i = const DateTimeHelper._();
 
   //
   //

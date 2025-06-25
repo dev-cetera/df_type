@@ -78,11 +78,13 @@ Set<_VersionSection> extractSections(String contents) {
         updates.add(line);
       }
     }
-    results.add(_VersionSection(
-      version: version,
-      releasedAt: releasedAt,
-      updates: updates,
-    ));
+    results.add(
+      _VersionSection(
+        version: version,
+        releasedAt: releasedAt,
+        updates: updates,
+      ),
+    );
   }
 
   return results;

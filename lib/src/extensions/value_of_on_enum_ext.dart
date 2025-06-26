@@ -13,7 +13,7 @@
 import 'package:collection/collection.dart';
 
 /// Provides a safe, string-based lookup method for enum iterables.
-extension $ValueOfOnEnumExtension<T extends Enum> on Iterable<T> {
+extension ValueOfOnEnumExtension<T extends Enum> on Iterable<T> {
   /// Returns the enum value from this iterable that matches the given string [value].
   ///
   /// The comparison is case-insensitive. Returns `null` if no match is found.

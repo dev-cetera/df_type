@@ -15,7 +15,7 @@ import 'dart:async';
 // ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
 
 /// Convenience methods for inspecting and converting a [FutureOr].
-extension $FutureOrExtension<T> on FutureOr<T> {
+extension FutureOrExt<T> on FutureOr<T> {
   /// Returns true if this is a [Future].
   @pragma('vm:prefer-inline')
   bool get isFuture => this is Future<T>;

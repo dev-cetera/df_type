@@ -16,7 +16,7 @@ repository: https://github.com/robmllze/df_type
 funding:
   - https://www.buymeacoffee.com/dev_cetera
 description: Simplifies type conversions, inspections, nested data access, sync/async operations and more.
-version: 0.14.0
+version: 0.14.1
 topics:
   - data
   - easy-packages

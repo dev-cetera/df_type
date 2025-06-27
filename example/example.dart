@@ -45,23 +45,6 @@ void main() async {
     "Alphabet.values.valueOf('B'): ${Alphabet.values.valueOf('B')}",
   ); // Alphabet.B
 
-  // --- Deep Get from Nested Data ---
-  print('\n*** Deep Get from Nested Data ***');
-  final data = {
-    'users': [
-      {'name': 'Alice'},
-      {'name': 'Bob'},
-    ],
-    '2': 'numeric key',
-  };
-  print(
-    "deepGet 'users.1.name': ${data.deepGet<String>('users.1.name')}",
-  ); // Bob
-  print("deepGet '2': ${data.deepGet<String>('2')}"); // numeric key
-  print(
-    "deepGet 'users.2.name': ${data.deepGet<String>('users.2.name')}",
-  ); // null
-
   // --- Function and FutureOr Extensions ---
   print('\n*** Function and FutureOr Extensions ***');
   int Function(int) addOne = (i) => i + 1;

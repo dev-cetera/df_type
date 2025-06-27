@@ -13,7 +13,6 @@ export 'odd/string_to_duration_converter.dart';
 export './type_checking/is_subtype.dart';
 export './type_checking/type_equality.dart';
 export './type_checking/is_nullable.dart';
-export './helpful/deep_get.dart';
 export './converters/let_or_null_collections.dart';
 export './converters/let_or_null_map.dart';
 export './converters/let_or_null.dart';

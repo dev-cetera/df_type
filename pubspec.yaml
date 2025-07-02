@@ -14,7 +14,9 @@ name: df_type
 homepage: https://dev-cetera.com/
 repository: https://github.com/robmllze/df_type
 funding:
-  - https://www.buymeacoffee.com/dev_cetera
+- https://www.buymeacoffee.com/dev_cetera
+- https://www.patreon.com/c/RobertMollentze
+- https://github.com/sponsors/robmllze
 description: Simplifies type conversions, inspections, nested data access, sync/async operations and more.
 version: 0.14.2
 topics:

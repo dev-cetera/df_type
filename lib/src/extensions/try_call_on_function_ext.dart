@@ -1,9 +1,10 @@
 //.title
 // ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
 //
-// Dart/Flutter (DF) Packages by dev-cetera.com & contributors. The use of this
-// source code is governed by an MIT-style license described in the LICENSE
-// file located in this project's root directory.
+// Copyright © dev-cetera.com & contributors.
+//
+// The use of this source code is governed by an MIT-style license described in
+// the LICENSE file located in this project's root directory.
 //
 // See: https://opensource.org/license/mit
 //
@@ -56,11 +57,10 @@ extension TryCallOnFunctionExt on Function {
       // Function.apply expects List<dynamic>, so we pass the args as-is.
       // The generic <A> provides compile-time checking for the caller.
       return Function.apply(
-            this,
-            positionalArguments ?? [],
-            namedArguments ?? {},
-          )
-          as T?;
+        this,
+        positionalArguments ?? [],
+        namedArguments ?? {},
+      ) as T?;
     } catch (_) {
       // Catches any exception during invocation (e.g., wrong argument types,
       // internal errors) and returns null.

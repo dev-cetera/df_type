@@ -1,9 +1,10 @@
 //.title
 // ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
 //
-// Dart/Flutter (DF) Packages by dev-cetera.com & contributors. The use of this
-// source code is governed by an MIT-style license described in the LICENSE
-// file located in this project's root directory.
+// Copyright © dev-cetera.com & contributors.
+//
+// The use of this source code is governed by an MIT-style license described in
+// the LICENSE file located in this project's root directory.
 //
 // See: https://opensource.org/license/mit
 //
@@ -39,10 +40,8 @@ T? letOrNull<T>(dynamic input) {
   assert(
     !(isSubtype<T, List<dynamic>>() && !isSubtype<List<dynamic>, T>()) &&
         !(isSubtype<T, Set<dynamic>>() && !isSubtype<Set<dynamic>, T>()) &&
-        !(isSubtype<T, Iterable<dynamic>>() &&
-            !isSubtype<Iterable<dynamic>, T>()) &&
-        !(isSubtype<T, Map<dynamic, dynamic>>() &&
-            !isSubtype<Map<dynamic, dynamic>, T>()),
+        !(isSubtype<T, Iterable<dynamic>>() && !isSubtype<Iterable<dynamic>, T>()) &&
+        !(isSubtype<T, Map<dynamic, dynamic>>() && !isSubtype<Map<dynamic, dynamic>, T>()),
     'letOrNull<$T> cannot be used with specific collection types due to type safety. '
     'Only generic collection types are supported.',
   );

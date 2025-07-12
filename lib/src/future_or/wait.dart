@@ -1,9 +1,10 @@
 //.title
 // ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
 //
-// Dart/Flutter (DF) Packages by dev-cetera.com & contributors. The use of this
-// source code is governed by an MIT-style license described in the LICENSE
-// file located in this project's root directory.
+// Copyright © dev-cetera.com & contributors.
+//
+// The use of this source code is governed by an MIT-style license described in
+// the LICENSE file located in this project's root directory.
 //
 // See: https://opensource.org/license/mit
 //
@@ -66,8 +67,7 @@ FutureOr<R> wait<R>(
 }) {
   return waitF(
     items.map(
-      (e) =>
-          () => e,
+      (e) => () => e,
     ),
     callback,
     onError: onError,
@@ -201,8 +201,7 @@ Future<R> _futureWait<R>(
   );
   return Future.wait(bufferAndErrors)
       .then(
-        (valuesAndErrors) =>
-            _processItems(syncError1, valuesAndErrors, callback, onError),
+        (valuesAndErrors) => _processItems(syncError1, valuesAndErrors, callback, onError),
       )
       .whenComplete(onComplete ?? () {});
 }

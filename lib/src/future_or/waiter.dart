@@ -1,9 +1,10 @@
 //.title
 // ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
 //
-// Dart/Flutter (DF) Packages by dev-cetera.com & contributors. The use of this
-// source code is governed by an MIT-style license described in the LICENSE
-// file located in this project's root directory.
+// Copyright © dev-cetera.com & contributors.
+//
+// The use of this source code is governed by an MIT-style license described in
+// the LICENSE file located in this project's root directory.
 //
 // See: https://opensource.org/license/mit
 //
@@ -55,8 +56,8 @@ class Waiter<T> {
   Waiter({
     _TOnErrorCallback? onError,
     List<_TOperation<T>> operations = const [],
-  }) : _onError = onError,
-       _operations = [...operations];
+  })  : _onError = onError,
+        _operations = [...operations];
 
   /// Adds a deferred operation to the queue.
   void add(_TOperation<T> operation) {

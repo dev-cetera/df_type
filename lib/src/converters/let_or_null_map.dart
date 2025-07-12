@@ -1,9 +1,10 @@
 //.title
 // ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
 //
-// Dart/Flutter (DF) Packages by dev-cetera.com & contributors. The use of this
-// source code is governed by an MIT-style license described in the LICENSE
-// file located in this project's root directory.
+// Copyright © dev-cetera.com & contributors.
+//
+// The use of this source code is governed by an MIT-style license described in
+// the LICENSE file located in this project's root directory.
 //
 // See: https://opensource.org/license/mit
 //
@@ -33,11 +34,11 @@ Map<K, V>? letMapOrNull<K, V>(dynamic input) {
   return switch (input) {
     final Map<dynamic, dynamic> m => _convertMapOrNull<K, V>(m),
     final String s => switch (jsonDecodeOrNull<Map<dynamic, dynamic>>(
-      s.trim(),
-    )) {
-      final Map<dynamic, dynamic> d => _convertMapOrNull<K, V>(d),
-      _ => null,
-    },
+        s.trim(),
+      )) {
+        final Map<dynamic, dynamic> d => _convertMapOrNull<K, V>(d),
+        _ => null,
+      },
     _ => null,
   };
 }

@@ -1,9 +1,10 @@
 //.title
 // ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
 //
-// Dart/Flutter (DF) Packages by dev-cetera.com & contributors. The use of this
-// source code is governed by an MIT-style license described in the LICENSE
-// file located in this project's root directory.
+// Copyright © dev-cetera.com & contributors.
+//
+// The use of this source code is governed by an MIT-style license described in
+// the LICENSE file located in this project's root directory.
 //
 // See: https://opensource.org/license/mit
 //
@@ -91,8 +92,7 @@ final class DateTimeUtils {
     if (filteredDates.length.isOdd) {
       return filteredDates[middleIndex];
     } else {
-      final medianMs =
-          (filteredDates[middleIndex - 1].millisecondsSinceEpoch +
+      final medianMs = (filteredDates[middleIndex - 1].millisecondsSinceEpoch +
               filteredDates[middleIndex].millisecondsSinceEpoch) ~/
           2;
       return DateTime.fromMillisecondsSinceEpoch(medianMs);

@@ -1,86 +1,31 @@
 # Release workflow
 
-This package ships through a two-stage GitHub Actions pipeline:
-
 ```
-push to prod  ──►  prod.yml  ──►  pushes tag v{version}  ──►  publish.yml  ──►  pub.dev
-                   (test, bump, tag)                          (re-test, publish)
+push to prod  →  prod.yml  →  pushes tag v{version}  →  publish.yml  →  pub.dev
 ```
 
-Splitting test-and-tag from publish lets pub.dev's "tag pattern" automated
-publishing config stay in charge of who can actually ship — only a tagged
-commit ever triggers a publish.
+## Day-to-day
 
-## Workflows
+Merge to `prod`. That's it. The workflow tests, bumps the version, writes a `CHANGELOG.md` stub, tags, and publishes.
 
-### `prod.yml` — runs on push to `prod`
+Don't touch GitHub Releases — they're not part of the trigger chain.
 
-1. `dart format --set-exit-if-changed`
-2. `dart analyze --fatal-infos`
-3. `dart test`
-4. **Decides the next version.**
-   - If the `version:` in `pubspec.yaml` is **not** yet tagged on the
-     remote, the workflow assumes you already bumped it manually and uses
-     it as-is.
-   - Otherwise it inspects the latest commit subject:
-     - Contains `BREAKING CHANGE`, starts with `breaking:`, or uses the
-       conventional `feat!:` / `fix!:` syntax → **major** bump.
-     - Starts with `feat` (`feat:`, `feat(scope):`, `feat ...`) → **minor**.
-     - Anything else → **patch**.
-5. **Applies the bump.** `pubspec.yaml` is updated; `CHANGELOG.md` gets a
-   new `## [version]` section assembled from the commit subject + any
-   `- bullet` body lines, but only if no entry for that version exists yet.
-6. **Commits the bump** back to `prod` as `ci: release v{version}`.
-   The bot's commit-author email is used to filter out self-triggers so
-   the workflow does not re-run on its own push.
-7. **Pushes the `v{version}` tag.**
+## Auto-bump rules
 
-If any step before 5 fails, the tag is **not** pushed and the publish never
-happens.
+Bump kind comes from the latest commit subject:
 
-### `publish.yml` — runs on push of a `v*` tag
+- `breaking:` or `feat!:` → major
+- `feat:` → minor
+- anything else → patch
 
-1. `dart analyze --fatal-infos` and `dart test` (defensive — guards against
-   hand-tagged commits).
-2. Confirms the tag version matches `pubspec.yaml`.
-3. `dart pub publish --force` over OIDC.
+To pick the version yourself, bump `version:` in `pubspec.yaml` before merging — the workflow respects pre-bumped versions and skips the auto-bump.
 
-## How to ship a release
-
-The fast path:
-
-1. Make changes on a branch.
-2. Merge to `prod`. That's it.
-3. The workflow bumps patch (or minor/major if your commit message says so),
-   writes a CHANGELOG entry, tags, and publishes.
-
-The deliberate path — when you want full control:
-
-1. Bump `version:` in `pubspec.yaml` yourself.
-2. Use the `/changelog` Claude command (`.claude/commands/changelog.md`) to
-   draft `CHANGELOG.md` from your diff.
-3. Merge to `prod`. The workflow notices the version is already untagged,
-   skips the auto-bump, and just tags + publishes.
-
-## Commit-message conventions for auto-bump
-
-| Want                | Commit subject example                  | Bump  |
-| ------------------- | --------------------------------------- | ----- |
-| Major (breaking)    | `breaking: drop deprecated API`         | major |
-| Major (conv. style) | `feat!: rewrite token loop`             | major |
-| Major (with body)   | `feat: new API` + `BREAKING CHANGE: …`  | major |
-| Minor (new feature) | `feat: add letDurationOrNull`           | minor |
-| Patch (anything)    | `fix: handle NaN in letIntOrNull`       | patch |
-| Patch (default)     | `tweak imports`                         | patch |
+For richer `CHANGELOG.md` entries than the commit-subject stub, run the `/changelog` slash command locally before merging.
 
 ## One-time pub.dev setup
 
-For `publish.yml` to authenticate, configure automated publishing on
-pub.dev:
+**pub.dev**: package page → **Admin** → enable **Automated publishing** with repo `<owner>/<repo>` and tag pattern `v{{version}}`.
 
-- Go to the package's pub.dev page → **Admin**.
-- Under **Automated publishing**, enable **Publishing from GitHub Actions**.
-- Repository: `<owner>/<repo>` (this package's repo).
-- Tag pattern: `v{{version}}`.
+**`RELEASE_PAT` secret** (repo or org secret): a classic PAT with `repo` scope, or a fine-grained PAT with `Contents: read+write` on this repo. Needed because tags pushed by the default `GITHUB_TOKEN` don't trigger `publish.yml`.
 
-See https://dart.dev/tools/pub/automated-publishing for details.
+When the PAT expires, `prod.yml` fails at checkout with a clear auth error — regenerate and update the secret.

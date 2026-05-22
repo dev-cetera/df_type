@@ -73,30 +73,40 @@ The deliberate path — when you want full control:
 | Patch (anything)    | `fix: handle NaN in letIntOrNull`       | patch |
 | Patch (default)     | `tweak imports`                         | patch |
 
-## One-time pub.dev setup
+## One-time setup
 
-For `publish.yml` to authenticate, configure automated publishing on
-pub.dev:
+### 1. pub.dev automated publishing
 
-- Go to the package's pub.dev page → **Admin**.
+For `publish.yml` to authenticate against pub.dev:
+
+- pub.dev → package page → **Admin** tab.
 - Under **Automated publishing**, enable **Publishing from GitHub Actions**.
 - Repository: `<owner>/<repo>` (this package's repo).
 - Tag pattern: `v{{version}}`.
 
 See https://dart.dev/tools/pub/automated-publishing for details.
 
-## Triggering `publish.yml`
+### 2. `RELEASE_PAT` repository secret
 
-Tags pushed by `prod.yml` use the default `GITHUB_TOKEN`, which by
-design does **not** trigger downstream workflows — so `publish.yml`
-will not fire automatically off a `prod` merge. Your release path is:
+`prod.yml` needs a Personal Access Token to push the version tag back to
+the repo. **This cannot be the default `GITHUB_TOKEN`** — tags pushed by
+GITHUB_TOKEN do not trigger downstream workflows by design, so
+`publish.yml` would never fire on its own.
 
-1. Merge to `prod` → `prod.yml` tests, bumps, and pushes a `v{version}`
-   tag.
-2. Once the tag exists, **manually create a release in the GitHub UI**
-   from that tag (Releases → Draft a new release → pick the tag → Publish).
-3. `publish.yml` catches the `release: published` event and ships to
-   pub.dev.
+Create the token at <https://github.com/settings/personal-access-tokens>:
 
-`publish.yml` also accepts `workflow_dispatch` as a last-resort manual
-shove from the Actions tab.
+- **Token name**: anything descriptive.
+- **Expiration**: 1 year is a good default; the workflow will start failing
+  with a clear `git push` auth error when it expires, prompting a rotation.
+- **Repository access**: Only select repositories → this package's repo.
+- **Repository permissions** → **Contents**: Read and write.
+- Everything else: No access.
+
+Store it on the repo:
+
+- Repo **Settings** → **Secrets and variables** → **Actions** → **New
+  repository secret**.
+- **Name**: `RELEASE_PAT`. **Secret**: paste the token.
+
+Without `RELEASE_PAT`, `prod.yml` fails at the checkout step with a clear
+"required secret missing" error so you can't silently push without it.

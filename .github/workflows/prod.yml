@@ -49,10 +49,16 @@ jobs:
     if: github.event.head_commit.author.email != 'github-actions[bot]@users.noreply.github.com'
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0  # Full history + tags for accurate bump decisions
           ref: prod
+          # `RELEASE_PAT` is a fine-grained PAT with `Contents: Read & write`
+          # on this repo. We need it instead of the default GITHUB_TOKEN
+          # because tag pushes authored by GITHUB_TOKEN deliberately do NOT
+          # trigger downstream workflows — and we need the tag push to
+          # trigger publish.yml. See `.github/_README.md` for setup steps.
+          token: ${{ secrets.RELEASE_PAT }}
 
       - name: Set up Dart
         uses: dart-lang/setup-dart@v1

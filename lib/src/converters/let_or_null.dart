@@ -131,6 +131,11 @@ num? letNumOrNull(dynamic input) {
 
 /// Converts [input] to [int], returning [Null] on failure.
 ///
+/// Returns [Null] for `NaN`, `Infinity`, `-Infinity`, and any value outside
+/// the signed 64-bit integer range — calling `num.toInt()` on those would
+/// throw `UnsupportedError` or silently saturate to `int64.min` / `int64.max`,
+/// both of which are unacceptable for mission-critical code.
+///
 /// Supported types:
 ///
 /// - [String]
@@ -138,8 +143,19 @@ num? letNumOrNull(dynamic input) {
 /// - [double]
 /// - [int]
 /// - [String]
-@pragma('vm:prefer-inline')
-int? letIntOrNull(dynamic input) => letNumOrNull(input)?.toInt();
+int? letIntOrNull(dynamic input) {
+  final n = letNumOrNull(input);
+  if (n == null) return null;
+  if (n is int) return n;
+  final d = n.toDouble();
+  if (!d.isFinite) return null;
+  // 9.223372036854776e18 is the smallest double strictly greater than
+  // int64.max; the symmetric bound on the negative side is exact.
+  if (d >= 9223372036854775808.0 || d < -9223372036854775808.0) {
+    return null;
+  }
+  return d.toInt();
+}
 
 /// Converts [input] to [double], returning [Null] on failure.
 ///
@@ -187,6 +203,6 @@ Uri? letUriOrNull(dynamic input) {
 /// - [DateTime]
 DateTime? letDateTimeOrNull(dynamic input) {
   if (input is DateTime) return input;
-  if (input is String) return DateTime.tryParse(input);
+  if (input is String) return DateTime.tryParse(input.trim());
   return null;
 }

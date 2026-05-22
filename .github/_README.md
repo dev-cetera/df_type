@@ -1,72 +1,86 @@
-# pub.dev_package_workflow
+# Release workflow
 
-This repository provides a powerful and streamlined set of GitHub Actions workflows designed to automate the entire lifecycle of your Dart and Flutter packages—from version bumping and changelog generation to publishing on pub.dev and deploying examples to GitHub Pages.
+This package ships through a two-stage GitHub Actions pipeline:
 
----
+```
+push to prod  ──►  prod.yml  ──►  pushes tag v{version}  ──►  publish.yml  ──►  pub.dev
+                   (test, bump, tag)                          (re-test, publish)
+```
 
-## 🚀 Core Features
-
-- **Automated Version Bumping:** Automatically update `CHANGELOG.md`, `README.md`, and other files when you're ready to release.
-- **Git Tagging:** Automatically create and push Git tags for new versions.
-- **Flexible Publishing Triggers:** Publish packages automatically via special commit messages or by creating a release in the GitHub UI.
-- **Example App Deployment:** An optional workflow to build and deploy a Flutter web example to GitHub Pages.
+Splitting test-and-tag from publish lets pub.dev's "tag pattern" automated
+publishing config stay in charge of who can actually ship — only a tagged
+commit ever triggers a publish.
 
 ## Workflows
 
-This project contains three key GitHub Actions workflows.
+### `prod.yml` — runs on push to `prod`
 
-### 1. `process-package.yml`
+1. `dart format --set-exit-if-changed`
+2. `dart analyze --fatal-infos`
+3. `dart test`
+4. **Decides the next version.**
+   - If the `version:` in `pubspec.yaml` is **not** yet tagged on the
+     remote, the workflow assumes you already bumped it manually and uses
+     it as-is.
+   - Otherwise it inspects the latest commit subject:
+     - Contains `BREAKING CHANGE`, starts with `breaking:`, or uses the
+       conventional `feat!:` / `fix!:` syntax → **major** bump.
+     - Starts with `feat` (`feat:`, `feat(scope):`, `feat ...`) → **minor**.
+     - Anything else → **patch**.
+5. **Applies the bump.** `pubspec.yaml` is updated; `CHANGELOG.md` gets a
+   new `## [version]` section assembled from the commit subject + any
+   `- bullet` body lines, but only if no entry for that version exists yet.
+6. **Commits the bump** back to `prod` as `ci: release v{version}`.
+   The bot's commit-author email is used to filter out self-triggers so
+   the workflow does not re-run on its own push.
+7. **Pushes the `v{version}` tag.**
 
-This is the primary workflow for managing releases directly from your commit messages. It triggers on every push to your `main` branch.
+If any step before 5 fails, the tag is **not** pushed and the publish never
+happens.
 
-- **Standard Commits:** For any normal commit message, the workflow does nothing.
-- **Prepare a Release (`+`):** If your commit message starts with a single plus sign (e.g., `+Added new feature`), the workflow will:
-    - Run `dart format` and `dart fix --apply`.
-    - Update your `CHANGELOG.md` with the commit message.
-    - Generate a standardized `README.md` from a central template.
-    - Commit these automated changes with the message `ci: bump version to v[version]`.
-    - Create and push a Git tag for the new version.
-- **Prepare and Publish (`++`):** If your commit message starts with two plus signs (e.g., `++Major performance improvements`), the workflow will do **everything above** and then automatically **publish the package to pub.dev** if properly configured. See https://dart.dev/tools/pub/automated-publishing.
+### `publish.yml` — runs on push of a `v*` tag
 
-### 2. `publish.yml`
+1. `dart analyze --fatal-infos` and `dart test` (defensive — guards against
+   hand-tagged commits).
+2. Confirms the tag version matches `pubspec.yaml`.
+3. `dart pub publish --force` over OIDC.
 
-This workflow provides a manual trigger for publishing. It activates **only** when you create a new release in the GitHub UI. This is perfect for when you want to review changes on the `main` branch before deciding to publish.
+## How to ship a release
 
-### 3. `deploy-example.yml` (Optional)
+The fast path:
 
-If your project contains a Flutter web example in a `hosted_example` directory, this workflow will automatically build it and deploy it to GitHub Pages on every push to the `main` branch. This is great for providing live demos of your package.
+1. Make changes on a branch.
+2. Merge to `prod`. That's it.
+3. The workflow bumps patch (or minor/major if your commit message says so),
+   writes a CHANGELOG entry, tags, and publishes.
 
----
+The deliberate path — when you want full control:
 
-## 🛠️ Setup Instructions
+1. Bump `version:` in `pubspec.yaml` yourself.
+2. Use the `/changelog` Claude command (`.claude/commands/changelog.md`) to
+   draft `CHANGELOG.md` from your diff.
+3. Merge to `prod`. The workflow notices the version is already untagged,
+   skips the auto-bump, and just tags + publishes.
 
-Setting up these workflows in your own package repository is simple.
+## Commit-message conventions for auto-bump
 
-**1. Navigate to Your Project's Root Directory**
+| Want                | Commit subject example                  | Bump  |
+| ------------------- | --------------------------------------- | ----- |
+| Major (breaking)    | `breaking: drop deprecated API`         | major |
+| Major (conv. style) | `feat!: rewrite token loop`             | major |
+| Major (with body)   | `feat: new API` + `BREAKING CHANGE: …`  | major |
+| Minor (new feature) | `feat: add letDurationOrNull`           | minor |
+| Patch (anything)    | `fix: handle NaN in letIntOrNull`       | patch |
+| Patch (default)     | `tweak imports`                         | patch |
 
-Open your terminal and `cd` into the root of your Dart or Flutter package.
+## One-time pub.dev setup
 
-```zsh
-cd /path/to/your_project
-```
+For `publish.yml` to authenticate, configure automated publishing on
+pub.dev:
 
-**2. Clone this Workflow Repository**
+- Go to the package's pub.dev page → **Admin**.
+- Under **Automated publishing**, enable **Publishing from GitHub Actions**.
+- Repository: `<owner>/<repo>` (this package's repo).
+- Tag pattern: `v{{version}}`.
 
-Clone this repository directly into a `.github` folder. This will create `.github/workflows` and `.github/scripts` for you.
-
-```zsh
-git clone https://github.com/dev-cetera/pub.dev_package_workflow.git .github
-```
-
-**3. Remove the Nested `.git` Directory**
-
-To make these workflow files part of your own project's Git history, you must delete the nested `.git` directory that was just cloned.
-
-**4. Configure `pub.dev` for Automated Publishing**
-
-For the `publish.yml` workflow to work, you must authorize GitHub Actions on `pub.dev`.
-
-- Go to your package's page on `pub.dev` and click the **Admin** tab.
-- Under **Automated publishing**, click **Enable publishing from GitHub Actions**.
-- Set the **Repository** to your `username/repository_name`.
-- Set the **Tag pattern** to `v{{version}}`.
+See https://dart.dev/tools/pub/automated-publishing for details.

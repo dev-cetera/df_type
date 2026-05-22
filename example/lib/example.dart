@@ -1,10 +1,23 @@
-## Summary
+//.title
+// ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+//
+// Copyright © dev-cetera.com & contributors.
+//
+// The use of this source code is governed by an MIT-style license described in
+// the LICENSE file located in this project's root directory.
+//
+// See: https://opensource.org/license/mit
+//
+// ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+//.title~
 
-A versatile package that simplifies type conversions, inspections, nested data access, sync/async operations and more.
+// ignore_for_file: omit_local_variable_types, unreachable_switch_case
 
-## Quickstart
+import 'dart:async';
+import 'package:df_type/df_type.dart';
 
-```dart
+// ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+
 enum Alphabet { A, B, C }
 
 enum Status { pending, active, done }
@@ -49,10 +62,9 @@ void main() async {
   print('consec result: $result'); // 10
 
   // `Waiter` for deferred, batched execution
-  final taskQueue = Waiter<String>();
-  taskQueue.add(() => 'Task 1');
-  taskQueue.add(() async => 'Task 2');
-  final waiterResults = await taskQueue.wait();
+  final waiter = Waiter<String>();
+  waiter.add(() => 'Task 1');
+  waiter.add(() async => 'Task 2');
+  final waiterResults = await waiter.wait();
   print('Waiter results: $waiterResults'); // (Task 1, Task 2)
 }
-```

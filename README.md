@@ -1,85 +1,107 @@
-<a href="https://www.buymeacoffee.com/dev_cetera" target="_blank"><img align="right" src="https://cdn.buymeacoffee.com/buttons/default-orange.png" height="48"></a>
-<a href="https://discord.gg/gEQ8y2nfyX" target="_blank"><img align="right" src="https://raw.githubusercontent.com/dev-cetera/.github/refs/heads/main/assets/icons/discord_icon/discord_icon.svg" height="48"></a>
-
-Dart & Flutter Packages by dev-cetera.com & contributors.
-
-[![sponsor](https://img.shields.io/badge/sponsor-grey?logo=github-sponsors)](https://github.com/sponsors/dev-cetera)
-[![patreon](https://img.shields.io/badge/patreon-grey?logo=patreon)](https://www.patreon.com/c/RobertMollentze)
 [![pub](https://img.shields.io/pub/v/df_type.svg)](https://pub.dev/packages/df_type)
-[![tag](https://img.shields.io/badge/tag-v0.14.2-purple?logo=github)](https://github.com/dev-cetera/df_type/tree/v0.14.2)
-[![license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/dev-cetera/df_type/main/LICENSE)
+[![tag](https://img.shields.io/badge/Tag-v0.16.0-purple?logo=github)](https://github.com/dev-cetera/df_type/tree/v0.16.0)
+[![buymeacoffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-FFDD00?logo=buy-me-a-coffee&logoColor=black)](https://www.buymeacoffee.com/dev_cetera)
+[![sponsor](https://img.shields.io/badge/Sponsor-grey?logo=github-sponsors&logoColor=pink)](https://github.com/sponsors/dev-cetera)
+[![patreon](https://img.shields.io/badge/Patreon-grey?logo=patreon)](https://www.patreon.com/robelator)
+[![discord](https://img.shields.io/badge/Discord-5865F2?logo=discord&logoColor=white)](https://discord.gg/gEQ8y2nfyX)
+[![instagram](https://img.shields.io/badge/Instagram-E4405F?logo=instagram&logoColor=white)](https://www.instagram.com/dev_cetera/)
+[![license](https://img.shields.io/badge/License-MIT-blue.svg)](https://raw.githubusercontent.com/dev-cetera/df_type/main/LICENSE)
 
 ---
-
-[![banner](https://github.com/dev-cetera/df_safer_dart/blob/v0.14.2/doc/assets/banner.png?raw=true)](https://github.com/dev-cetera)
-
-<!-- BEGIN _README_CONTENT -->
 
 ## Summary
 
-A versatile package that simplifies type conversions, inspections, nested data access, sync/async operations and more.
+Small, focused utilities for runtime type handling, lenient value coercion,
+and mixed sync/async flows in Dart.
 
-## Quickstart
+What's in the box:
+
+- **Safe value coercion** — `letOrNull<T>(input)` plus a family of
+  `let{Int,Double,Bool,Num,Uri,DateTime,String,Iterable,List,Set,Map}OrNull`
+  helpers that return `null` on any failure instead of throwing. Rejects
+  silently-unsafe inputs (NaN, infinity, out-of-range doubles) rather than
+  saturating.
+- **Type-level inspection** — `isSubtype<TChild, TParent>()`,
+  `typeEquality<T1, T2>()`, and `isNullable<T>()` for generic-level checks
+  that aren't otherwise expressible in Dart.
+- **`FutureOr` orchestration** — `wait`, `waitF`, and the `consec1..consec9`
+  family run mixed sync/async work in argument order, with `eagerError` and
+  lifecycle callbacks (`onError`, `onComplete`). Stays synchronous when all
+  inputs are synchronous.
+- **`Waiter<T>`** — a deferred batch of operations you can build up over
+  time and then execute together. Unlike `Future.wait`, the operations
+  haven't started yet when you register them.
+- **`decodeJsonbStrings`** — recursively decodes JSON-shaped strings inside
+  a value tree. Handy for Postgres `jsonb` columns that may arrive
+  pre-decoded or as raw JSON depending on the driver.
+- **Convenience extensions** — `Function.tryCall` (safe `Function.apply`),
+  `Iterable<Enum>.valueOf` (case-insensitive enum lookup), and `FutureOrExt`
+  (`isFuture`, `withMinDuration`, etc.).
+
+## Installation
+
+```sh
+dart pub add df_type
+# or, for a Flutter project:
+flutter pub add df_type
+```
+
+## Usage
 
 ```dart
-enum Alphabet { A, B, C }
-
-enum Status { pending, active, done }
+import 'package:df_type/df_type.dart';
 
 void main() async {
-  // --- Type Checking ---
-  print('\n*** Type Checking Utilities ***');
-  print('isNullable<String?>: ${isNullable<String?>()}'); // true
-  print('isSubtype<int, num>: ${isSubtype<int, num>()}'); // true
-  print('typeEquality<int, int>: ${typeEquality<int, int>()}'); // true
-  print('typeEquality<int, String>: ${typeEquality<int, String>()}'); // false
+  // Lenient scalar coercion.
+  letIntOrNull('42');           // 42
+  letIntOrNull('not a number'); // null
+  letIntOrNull(double.nan);     // null (never throws, never saturates)
 
-  // --- Type Conversion ---
-  print('\n*** Type Conversion Utilities ***');
-  print("letIntOrNull('55'): ${letIntOrNull('55')}"); // 55
-  print(
-    "letMapOrNull from JSON: ${letMapOrNull<String, dynamic>('{"a": 1}')}",
-  ); // {a: 1}
-  print(
-    "letListOrNull from CSV: ${letListOrNull<int>('1, 2, 3')}",
-  ); // [1, 2, 3]
+  // Nested collection coercion from a JSON string.
+  letMapOrNull<String, int>('{"a":1,"b":2}'); // {a: 1, b: 2}
 
-  // --- Enum Helpers ---
-  print('\n*** Enum Helpers ***');
-  print(
-    "Alphabet.values.valueOf('B'): ${Alphabet.values.valueOf('B')}",
-  ); // Alphabet.B
-
-  // --- Function and FutureOr Extensions ---
-  print('\n*** Function and FutureOr Extensions ***');
-  int Function(int) addOne = (i) => i + 1;
-  print('Function.tryCall: ${addOne.tryCall<int, int>([5])}'); // 6
-
-  FutureOr<int> futureOrValue = Future.value(10);
-  print('futureOrValue.isFuture: ${futureOrValue.isFuture}'); // true
-  print('futureOrValue.toFuture(): ${await futureOrValue.toFuture()}'); // 10
-
-  // --- Asynchronous Helpers ---
-  print('\n*** Asynchronous Helpers ***');
-  // `consec` for handling a mix of sync/async values
-  final result = await consec(Future.value(5), (val) => val * 2);
-  print('consec result: $result'); // 10
-
-  // `Waiter` for deferred, batched execution
-  final taskQueue = Waiter<String>();
-  taskQueue.add(() => 'Task 1');
-  taskQueue.add(() async => 'Task 2');
-  final waiterResults = await taskQueue.wait();
-  print('Waiter results: $waiterResults'); // (Task 1, Task 2)
+  // Mixed sync/async, results delivered in the order you passed them in.
+  final greeting = await consec3<String, int, String, String>(
+    Future.delayed(const Duration(milliseconds: 10), () => 'hello'),
+    42,
+    Future.value('world'),
+    (a, b, c) => '$a $b $c',
+  );
+  print(greeting); // hello 42 world
 }
 ```
 
+## Testing
 
-<!-- END _README_CONTENT -->
+```sh
+dart test
+```
+
+The package is exercised by a per-module test suite (one `*_test.dart`
+file per source file) plus a `hardening_test.dart` of regression cases
+for historic bugs. The orchestration core in `lib/src/future_or/` is
+covered by abuse tests that exercise the sync/async ordering, error
+propagation, and lifecycle-callback contracts.
+
+## Release flow
+
+This package ships through a two-stage GitHub Actions pipeline. See
+[`.github/_README.md`](.github/_README.md) for the full story.
+
+Short version: merge to the `prod` branch and you're done. The workflow
+runs tests, auto-bumps the version (patch by default, or minor/major if
+your commit message says `feat:` / `breaking:` / `feat!:`), updates
+`CHANGELOG.md`, tags, and publishes to pub.dev.
+
+If you want full control over the version and changelog instead of
+letting the workflow decide, bump `pubspec.yaml` yourself and use the
+`/changelog` Claude command at
+[`.claude/commands/changelog.md`](.claude/commands/changelog.md) to draft
+the entry — the workflow will respect your pre-bumped version.
 
 ---
 
-☝️ Please refer to the [API reference](https://pub.dev/documentation/df_type/) for more information.
+🔍 For more information, refer to the [API reference](https://pub.dev/documentation/df_type/).
 
 ---
 
@@ -89,7 +111,6 @@ This is an open-source project, and we warmly welcome contributions from everyon
 
 ### ☝️ Ways you can contribute
 
-- **Buy me a coffee:** If you'd like to support the project financially, consider [buying me a coffee](https://www.buymeacoffee.com/dev_cetera). Your support helps cover the costs of development and keeps the project growing.
 - **Find us on Discord:** Feel free to ask questions and engage with the community here: https://discord.gg/gEQ8y2nfyX.
 - **Share your ideas:** Every perspective matters, and your ideas can spark innovation.
 - **Help others:** Engage with other users by offering advice, solutions, or troubleshooting assistance.
@@ -106,7 +127,6 @@ If you're enjoying this package and find it valuable, consider showing your appr
 
 <a href="https://www.buymeacoffee.com/dev_cetera" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" height="40"></a>
 
-## 🧑‍⚖️ License
+## LICENSE
 
 This project is released under the [MIT License](https://raw.githubusercontent.com/dev-cetera/df_type/main/LICENSE). See [LICENSE](https://raw.githubusercontent.com/dev-cetera/df_type/main/LICENSE) for more information.
-

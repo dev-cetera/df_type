@@ -45,7 +45,7 @@ Iterable<T?>? letIterableOrNull<T>(dynamic input) {
   return null;
 }
 
-// Converts [input] to `List<Option<T>>`, returning [Null] on failure.
+/// Converts [input] to `List<Option<T>>`, returning [Null] on failure.
 ///
 /// Supported types:
 ///
@@ -65,7 +65,7 @@ List<T?>? letListOrNull<T>(dynamic input) {
   return letIterableOrNull<T>(input)?.toList();
 }
 
-// Converts [input] to `Set<Option<T>>`, returning [Null] on failure.
+/// Converts [input] to `Set<Option<T>>`, returning [Null] on failure.
 ///
 /// Supported types:
 /// - [bool]

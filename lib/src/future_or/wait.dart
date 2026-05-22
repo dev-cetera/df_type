@@ -84,39 +84,46 @@ FutureOr<R> waitF<R>(
   bool eagerError = true,
   _TOnCompleteCallback? onComplete,
 }) {
-  final syncBuffer = <dynamic>[];
-  final asyncBuffer = <Future<dynamic>>[];
+  // Single in-order buffer: holds either raw sync values or pending Futures.
+  // This guarantees the callback observes results in the same order the
+  // caller passed them in — `consec2(asyncA, syncB, ...)` must see `[A, B]`,
+  // not `[B, A]`. The previous implementation split sync/async into two
+  // buffers and concatenated them, silently reordering arguments.
+  final buffer = <dynamic>[];
+  var hasAsync = false;
   _Error? syncError1;
   for (final itemFactory in itemFactories) {
     try {
       final item = itemFactory();
-      if (item is Future) {
-        asyncBuffer.add(item);
-      } else {
-        syncBuffer.add(item);
-      }
+      buffer.add(item);
+      if (item is Future) hasAsync = true;
     } catch (e, s) {
       if (eagerError) {
         return _handleErrorAndComplete(_Error(e, s), onError, onComplete);
       }
-      if (syncError1 == null) {
-        syncError1 = _Error(e, s);
-        asyncBuffer.add(Future.error(e, s));
-      }
+      // Record only the first sync error for reporting, but always push a
+      // placeholder Future.error into the buffer so its length stays aligned
+      // with the input. Otherwise `consecN`'s positional access drifts when
+      // multiple sync factories throw under `eagerError: false`.
+      syncError1 ??= _Error(e, s);
+      buffer.add(Future<dynamic>.error(e, s));
+      hasAsync = true;
     }
   }
-  if (asyncBuffer.isEmpty) {
+  if (!hasAsync) {
     return _handleSyncPath(
       syncError1,
-      syncBuffer,
+      buffer,
       callback,
       onError,
       onComplete,
     );
   }
+  final asyncBuffer = buffer
+      .map<Future<dynamic>>((e) => e is Future ? e : Future<dynamic>.value(e))
+      .toList(growable: false);
   return _handleAsyncPath(
     syncError1,
-    syncBuffer,
     asyncBuffer,
     eagerError,
     callback,
@@ -149,14 +156,12 @@ FutureOr<R> _handleSyncPath<R>(
 
 FutureOr<R> _handleAsyncPath<R>(
   _Error? syncError1,
-  List<dynamic> syncBuffer,
-  List<Future<dynamic>> asyncBuffer,
+  List<Future<dynamic>> buffer,
   bool eagerError,
   _TSyncOrAsyncMapper<Iterable<dynamic>, R> callback,
   _TOnErrorCallback? onError,
   _TOnCompleteCallback? onComplete,
 ) {
-  final buffer = [...syncBuffer.map((e) => Future.value(e)), ...asyncBuffer];
   if (eagerError) {
     return _futureWaitEagerError(
       buffer,

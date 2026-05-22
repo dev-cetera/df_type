@@ -36,8 +36,10 @@ import 'package:test/test.dart';
 void main() {
   group('wait — synchronous fast path', () {
     test('all-sync items stay synchronous (no Future returned)', () {
-      final result = wait<int>(<FutureOr<dynamic>>[1, 2, 3],
-          (items) => items.fold<int>(0, (a, b) => a + (b as int)),);
+      final result = wait<int>(
+        <FutureOr<dynamic>>[1, 2, 3],
+        (items) => items.fold<int>(0, (a, b) => a + (b as int)),
+      );
       expect(result, isA<int>());
       expect(result, 6);
     });
@@ -119,8 +121,11 @@ void main() {
         }(),
         throwsA(isA<StateError>()),
       );
-      expect(onCompleteRan, isTrue,
-          reason: 'onComplete must always run on the sync-throw path',);
+      expect(
+        onCompleteRan,
+        isTrue,
+        reason: 'onComplete must always run on the sync-throw path',
+      );
     });
 
     test('eagerError=false: sync errors are deferred until after all factories',
@@ -225,8 +230,11 @@ void main() {
         ),
         throwsA(isA<StateError>()),
       );
-      expect(onErrorRan, isTrue,
-          reason: 'async onError must run to completion before rethrow',);
+      expect(
+        onErrorRan,
+        isTrue,
+        reason: 'async onError must run to completion before rethrow',
+      );
     });
 
     test('a throwing onError is itself rethrown — no silent swallow', () async {

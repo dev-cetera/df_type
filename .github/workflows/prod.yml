@@ -60,8 +60,12 @@ jobs:
       - name: Install dependencies
         run: dart pub get
 
-      - name: Verify formatter
-        run: dart format --output=none --set-exit-if-changed .
+      # Formatter runs in mutating mode — any reformatted files are picked
+      # up by the `git add -u` in the commit step below and shipped as part
+      # of the same `ci: release v{version}` commit. This avoids the
+      # "merged with one whitespace nit and CI fails" trap.
+      - name: Run formatter
+        run: dart format .
 
       - name: Static analysis
         run: dart analyze --fatal-infos
@@ -207,9 +211,14 @@ jobs:
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          # pubspec.yaml + CHANGELOG.md may have been touched by the bump
+          # steps; `git add -u` then picks up any tracked file modified by
+          # `dart format .` so formatting changes ride along in the same
+          # release commit. Untracked files are deliberately not staged.
           git add pubspec.yaml CHANGELOG.md
+          git add -u
           if git diff --staged --quiet; then
-            echo "No bump-related changes to commit."
+            echo "No bump or formatting changes to commit."
             echo "COMMITTED=false" >> "$GITHUB_OUTPUT"
           else
             git commit -m "ci: release v${NEXT}"

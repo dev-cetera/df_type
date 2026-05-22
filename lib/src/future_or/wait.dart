@@ -206,7 +206,8 @@ Future<R> _futureWait<R>(
   );
   return Future.wait(bufferAndErrors)
       .then(
-        (valuesAndErrors) => _processItems(syncError1, valuesAndErrors, callback, onError),
+        (valuesAndErrors) =>
+            _processItems(syncError1, valuesAndErrors, callback, onError),
       )
       .whenComplete(onComplete ?? () {});
 }

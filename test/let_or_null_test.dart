@@ -252,10 +252,14 @@ void main() {
     test('asserts when given a specific collection subtype', () {
       // Per the assert, `letOrNull<List<int>>` is rejected — specific element
       // types are not safe to construct, only `List<dynamic>` is.
-      expect(() => letOrNull<List<int>>([1, 2, 3]),
-          throwsA(isA<AssertionError>()),);
       expect(
-          () => letOrNull<Set<int>>(<int>{1}), throwsA(isA<AssertionError>()),);
+        () => letOrNull<List<int>>([1, 2, 3]),
+        throwsA(isA<AssertionError>()),
+      );
+      expect(
+        () => letOrNull<Set<int>>(<int>{1}),
+        throwsA(isA<AssertionError>()),
+      );
       expect(
         () => letOrNull<Map<String, int>>(<String, int>{'a': 1}),
         throwsA(isA<AssertionError>()),

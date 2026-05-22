@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.16.1]
+
+- update
+
+
 ## [0.16.0]
 
 - breaking: Remove `DateTimeUtils`, `StreamUtils`, and `StringToDurationConverter`. Moved to the new `df_odd` package.

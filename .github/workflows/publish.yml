@@ -11,16 +11,20 @@
 ## ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
 ##.title~
 
-# Publishes to pub.dev. Triggered exclusively by the push of a tag matching
-# `v{X.Y.Z}` (or `v{X.Y.Z+build}`). The companion `prod.yml` workflow is what
-# normally creates those tags, but a maintainer can also tag manually if they
-# want to ship without going through the prod branch.
+# Publishes to pub.dev. Triggered by:
+#   - A tag push matching `v{X.Y.Z}` (the prod.yml workflow normally creates
+#     these — but note that tags pushed by the default GITHUB_TOKEN do NOT
+#     trigger downstream workflows; you need either a PAT in prod.yml, a
+#     GitHub App, or to hand-create a release from the tag in the UI).
+#   - A release being published (the manual fallback — create a release
+#     from an existing tag in the GitHub UI and this workflow fires).
+#   - A manual workflow_dispatch (last-resort hand-shove).
 #
 # pub.dev's "Automated publishing" must be enabled with:
 #   Repository:    <owner>/<repo>
 #   Tag pattern:   v{{version}}
-# pub.dev verifies the OIDC token against that tag pattern, so a publish from
-# any other context (e.g. a forked PR, a branch push) will be rejected by
+# pub.dev verifies the OIDC token against that tag pattern, so a publish
+# from any other context (e.g. a forked PR, a branch push) is rejected by
 # pub.dev itself — defense in depth.
 
 name: Publish to pub.dev
@@ -30,6 +34,9 @@ on:
     tags:
       - 'v[0-9]+.[0-9]+.[0-9]+'        # v1.2.3
       - 'v[0-9]+.[0-9]+.[0-9]+\+*'     # v1.2.3+4
+  release:
+    types: [published]
+  workflow_dispatch:
 
 jobs:
   publish:

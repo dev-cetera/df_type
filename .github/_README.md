@@ -84,3 +84,19 @@ pub.dev:
 - Tag pattern: `v{{version}}`.
 
 See https://dart.dev/tools/pub/automated-publishing for details.
+
+## Triggering `publish.yml`
+
+Tags pushed by `prod.yml` use the default `GITHUB_TOKEN`, which by
+design does **not** trigger downstream workflows — so `publish.yml`
+will not fire automatically off a `prod` merge. Your release path is:
+
+1. Merge to `prod` → `prod.yml` tests, bumps, and pushes a `v{version}`
+   tag.
+2. Once the tag exists, **manually create a release in the GitHub UI**
+   from that tag (Releases → Draft a new release → pick the tag → Publish).
+3. `publish.yml` catches the `release: published` event and ships to
+   pub.dev.
+
+`publish.yml` also accepts `workflow_dispatch` as a last-resort manual
+shove from the Actions tab.

@@ -6,7 +6,7 @@
 
 
 
-## [0.15.0]
+## [0.16.0]
 
 - breaking: Remove `DateTimeUtils`, `StreamUtils`, and `StringToDurationConverter`. Moved to the new `df_odd` package.
 - breaking: Rename extension `ValueOfOnEnumExtension` to `ValueOfOnEnumExt`.

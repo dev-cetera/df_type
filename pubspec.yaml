@@ -19,7 +19,7 @@ funding:
   - https://www.patreon.com/c/robelator
   - https://github.com/sponsors/robelator
 description: Simplifies type conversions, inspections, nested data access, sync/async operations and more.
-version: 0.15.1
+version: 0.16.0
 topics:
   - data
   - easy-packages

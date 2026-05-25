@@ -1,30 +1,14 @@
-##.title
-## ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-##
-## Copyright © dev-cetera.com & contributors.
-##
-## The use of this source code is governed by an MIT-style license described in
-## the LICENSE file located in this project's root directory.
-##
-## See: https://opensource.org/license/mit
-##
-## ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-##.title~
-
-# Publishes to pub.dev. Triggered by the push of a `v{X.Y.Z}` tag — the
-# prod.yml workflow creates and pushes that tag using the `RELEASE_PAT`
-# secret, which is required because tags pushed by the default GITHUB_TOKEN
-# do NOT trigger downstream workflows.
-#
-# `workflow_dispatch` is also accepted as a manual last-resort, but pub.dev's
-# OIDC check requires the trigger to be a tag push for the publish to be
-# accepted, so the dispatch path will only succeed for diagnostics
-# (e.g. running the test step) — the publish step itself will be rejected
-# by pub.dev unless the run was triggered by an actual tag push.
+# Publishes to pub.dev. Triggered exclusively by the push of a tag matching
+# `v{X.Y.Z}` (or `v{X.Y.Z+build}`). The companion `prod.yml` workflow is what
+# normally creates those tags, but a maintainer can also tag manually if they
+# want to ship without going through the prod branch.
 #
 # pub.dev's "Automated publishing" must be enabled with:
 #   Repository:    <owner>/<repo>
 #   Tag pattern:   v{{version}}
+# pub.dev verifies the OIDC token against that tag pattern, so a publish from
+# any other context (e.g. a forked PR, a branch push) will be rejected by
+# pub.dev itself — defense in depth.
 
 name: Publish to pub.dev
 
@@ -33,7 +17,6 @@ on:
     tags:
       - 'v[0-9]+.[0-9]+.[0-9]+'        # v1.2.3
       - 'v[0-9]+.[0-9]+.[0-9]+\+*'     # v1.2.3+4
-  workflow_dispatch:
 
 jobs:
   publish:

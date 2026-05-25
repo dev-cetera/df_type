@@ -28,8 +28,10 @@ import 'package:test/test.dart';
 ///   between sync-throws-in-factory and async-rejected-Future.
 /// - Forgetting to run onComplete on every exit path (success, sync error,
 ///   async error).
-/// - Letting an exception inside onError escape (it must replace the original
-///   error, not be silently swallowed and not be additive).
+/// - Letting a buggy `onError` mask the original error. The contract for
+///   medical-grade use is: the **original** error always propagates to the
+///   caller; a throw inside `onError` is surfaced through the surrounding
+///   `Zone.handleUncaughtError`, never substituted in place of the incident.
 ///
 /// The tests are organised by concern, not by entry point — each one picks
 /// whichever of `wait`/`waitF` is most natural.
@@ -237,16 +239,31 @@ void main() {
       );
     });
 
-    test('a throwing onError is itself rethrown — no silent swallow', () async {
-      await expectLater(
-        wait<int>(
-          <FutureOr<dynamic>>[Future<int>.error(StateError('original'))],
-          (items) => 0,
-          onError: (e, s) => throw ArgumentError('replacement'),
-        ),
-        throwsA(isA<ArgumentError>()),
-      );
-    });
+    test(
+      'a throwing onError does not mask the original error — the original '
+      'propagates and the handler bug is surfaced via the surrounding Zone',
+      () async {
+        Object? zoneCapture;
+        await runZonedGuarded<Future<void>>(
+          () async {
+            await expectLater(
+              wait<int>(
+                <FutureOr<dynamic>>[Future<int>.error(StateError('original'))],
+                (items) => 0,
+                onError: (e, s) => throw ArgumentError('replacement'),
+              ),
+              throwsA(isA<StateError>()),
+            );
+          },
+          (e, s) => zoneCapture = e,
+        );
+        expect(
+          zoneCapture,
+          isA<ArgumentError>(),
+          reason: 'the handler bug must be visible through the Zone, not lost',
+        );
+      },
+    );
   });
 
   group('wait — onComplete behaviour', () {

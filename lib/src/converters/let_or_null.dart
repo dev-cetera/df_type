@@ -17,6 +17,27 @@ import '../_src.g.dart';
 
 // ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
 
+/// True when running on the JS runtime (Flutter web / dart2js / dartdevc).
+///
+/// Detection is via `identical(0, 0.0)`: on the Dart VM the int `0` and the
+/// double `0.0` are distinct objects (different runtime types), but on JS
+/// both are the same `Number`, so the identity check passes there. Computed
+/// once at load and held in a `final` to avoid per-call overhead.
+final bool isJsRuntime = identical(0, 0.0);
+
+/// 2^53 — the largest integer that JS `Number` (IEEE 754 double) can
+/// represent exactly. Beyond this, integer arithmetic silently loses
+/// precision. Used as the safe-integer bound on the JS runtime.
+const double jsSafeIntegerBound = 9007199254740992.0;
+
+/// 2^63 — one past the maximum signed 64-bit integer. The VM's `int` is a
+/// true int64, so this is the (positive-side) bound. Negative-side bound is
+/// `-2^63` and *is* in range, hence the asymmetric comparison in
+/// [letIntOrNull].
+const double vmInt64Bound = 9223372036854775808.0;
+
+// ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+
 /// Attempts to convert a dynamic [input] to the specified type [T], returning
 /// [Null] on failure.
 ///
@@ -37,16 +58,22 @@ import '../_src.g.dart';
 /// - [Set] (dynamic)
 /// - [Map] (dynamic, dynamic)
 T? letOrNull<T>(dynamic input) {
-  assert(
-    !(isSubtype<T, List<dynamic>>() && !isSubtype<List<dynamic>, T>()) &&
-        !(isSubtype<T, Set<dynamic>>() && !isSubtype<Set<dynamic>, T>()) &&
-        !(isSubtype<T, Iterable<dynamic>>() &&
-            !isSubtype<Iterable<dynamic>, T>()) &&
-        !(isSubtype<T, Map<dynamic, dynamic>>() &&
-            !isSubtype<Map<dynamic, dynamic>, T>()),
-    'letOrNull<$T> cannot be used with specific collection types due to type safety. '
-    'Only generic collection types are supported.',
-  );
+  // Enforced in release as well: a stripped assert would let a misuse like
+  // `letOrNull<List<int>>(...)` silently return null, which is
+  // indistinguishable from a real conversion failure. For medical-grade
+  // code that's an unacceptable silent failure.
+  if ((isSubtype<T, List<dynamic>>() && !isSubtype<List<dynamic>, T>()) ||
+      (isSubtype<T, Set<dynamic>>() && !isSubtype<Set<dynamic>, T>()) ||
+      (isSubtype<T, Iterable<dynamic>>() &&
+          !isSubtype<Iterable<dynamic>, T>()) ||
+      (isSubtype<T, Map<dynamic, dynamic>>() &&
+          !isSubtype<Map<dynamic, dynamic>, T>())) {
+    throw ArgumentError(
+      'letOrNull<$T> cannot be used with specific collection types due to '
+      'type safety. Only the broadest collection types '
+      '(Iterable<dynamic>, Map<dynamic, dynamic>) are supported.',
+    );
+  }
   if (input is T) return input;
   if (input == null) return null;
   final raw = () {
@@ -87,10 +114,16 @@ T? letAsOrNull<T>(dynamic input) => input is T ? input : null;
 
 /// Converts [input] to [String], returning [Null] on failure.
 ///
+/// `null` in produces `null` out — never the literal four-character string
+/// `'null'` that `null.toString()` would otherwise yield. Leaking that
+/// sentinel into a medical record is unacceptable, so the null guard is the
+/// safer default.
+///
 /// Supported types:
 ///
 /// - [Object]
 String? letAsStringOrNull(dynamic input) {
+  if (input == null) return null;
   try {
     return input.toString();
   } catch (_) {
@@ -133,28 +166,45 @@ num? letNumOrNull(dynamic input) {
 
 /// Converts [input] to [int], returning [Null] on failure.
 ///
-/// Returns [Null] for `NaN`, `Infinity`, `-Infinity`, and any value outside
-/// the signed 64-bit integer range — calling `num.toInt()` on those would
-/// throw `UnsupportedError` or silently saturate to `int64.min` / `int64.max`,
-/// both of which are unacceptable for mission-critical code.
+/// Returns [Null] for `NaN`, `Infinity`, `-Infinity`, and any value whose
+/// integer representation would lose precision or saturate on the current
+/// runtime. Calling `num.toInt()` on out-of-range doubles would throw
+/// `UnsupportedError` or silently clamp to `int64.min` / `int64.max` —
+/// both unacceptable for life-critical code.
 ///
-/// Supported types:
+/// **Cross-runtime safety.** The accepted range adapts to the runtime:
 ///
-/// - [String]
-/// - [num]
-/// - [double]
+/// - On the **Dart VM**, `int` is a true 64-bit integer, so values in
+///   `[-2^63, 2^63)` round-trip exactly.
+/// - On the **JS runtime** (Flutter web / dart2js / dartdevc), `int` is
+///   backed by a 64-bit double, so only `[-2^53, 2^53]` is exact. Values
+///   outside that band have already lost precision by the time we see
+///   them, so [letIntOrNull] returns `null` rather than handing back a
+///   silently-rounded value.
+///
+/// Supported input types:
+///
 /// - [int]
+/// - [num] / [double]
 /// - [String]
 int? letIntOrNull(dynamic input) {
   final n = letNumOrNull(input);
   if (n == null) return null;
-  if (n is int) return n;
+  if (n is int) {
+    // On JS, an `n is int` value past 2^53 may have already lost precision
+    // during parsing — refuse it for life-critical use.
+    if (isJsRuntime && (n > 9007199254740992 || n < -9007199254740992)) {
+      return null;
+    }
+    return n;
+  }
   final d = n.toDouble();
   if (!d.isFinite) return null;
-  // 9.223372036854776e18 is the smallest double strictly greater than
-  // int64.max; the symmetric bound on the negative side is exact.
-  if (d >= 9223372036854775808.0 || d < -9223372036854775808.0) {
-    return null;
+  if (isJsRuntime) {
+    if (d > jsSafeIntegerBound || d < -jsSafeIntegerBound) return null;
+  } else {
+    // VM: 2^63 itself is *not* in int64 (max is 2^63 - 1), but -2^63 *is*.
+    if (d >= vmInt64Bound || d < -vmInt64Bound) return null;
   }
   return d.toInt();
 }

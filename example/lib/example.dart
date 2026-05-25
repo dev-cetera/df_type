@@ -61,10 +61,12 @@ void main() async {
   final result = await consec(Future.value(5), (val) => val * 2);
   print('consec result: $result'); // 10
 
-  // `Waiter` for deferred, batched execution
-  final waiter = Waiter<String>();
-  waiter.add(() => 'Task 1');
-  waiter.add(() async => 'Task 2');
+  // `Waiter` for deferred, batched execution. Operations are stored as
+  // immutable `WaiterOperation` value objects; `addFn` is the shortcut for
+  // wrapping a bare function.
+  final waiter = Waiter<String>()
+    ..addFn(() => 'Task 1', id: 'task-1')
+    ..addFn(() async => 'Task 2', id: 'task-2');
   final waiterResults = await waiter.wait();
   print('Waiter results: $waiterResults'); // (Task 1, Task 2)
 }

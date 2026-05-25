@@ -9,10 +9,14 @@
 
 ---
 
+<!-- BEGIN _README_CONTENT -->
+
 ## Summary
 
 Small, focused utilities for runtime type handling, lenient value coercion,
-and mixed sync/async flows in Dart.
+and mixed sync/async flows in Dart. Hardened for **life-critical use**:
+silent data corruption, masked errors, and silent saturations are all
+defects, not features.
 
 What's in the box:
 
@@ -20,23 +24,33 @@ What's in the box:
   `let{Int,Double,Bool,Num,Uri,DateTime,String,Iterable,List,Set,Map}OrNull`
   helpers that return `null` on any failure instead of throwing. Rejects
   silently-unsafe inputs (NaN, infinity, out-of-range doubles) rather than
-  saturating.
+  saturating. `letIntOrNull` uses the runtime-correct safe bound on web
+  (`±2^53`) versus VM (`±2^63`). `letMapOrNull` rejects coerced-key
+  collisions instead of letting one entry overwrite another.
 - **Type-level inspection** — `isSubtype<TChild, TParent>()`,
   `typeEquality<T1, T2>()`, and `isNullable<T>()` for generic-level checks
   that aren't otherwise expressible in Dart.
 - **`FutureOr` orchestration** — `wait`, `waitF`, and the `consec1..consec9`
   family run mixed sync/async work in argument order, with `eagerError` and
   lifecycle callbacks (`onError`, `onComplete`). Stays synchronous when all
-  inputs are synchronous.
+  inputs are synchronous. The original error always reaches the caller —
+  buggy handlers are surfaced through `Zone.handleUncaughtError` but never
+  mask the incident. `onComplete` runs on every exit path.
 - **`Waiter<T>`** — a deferred batch of operations you can build up over
-  time and then execute together. Unlike `Future.wait`, the operations
-  haven't started yet when you register them.
+  time and then execute together. Operations are stored as immutable
+  [`WaiterOperation<T>`](#waiteroperation--cross-isolate-friendly) value
+  objects, which makes the queue auditable and (when callers use top-level
+  functions) sendable across isolates.
 - **`decodeJsonbStrings`** — recursively decodes JSON-shaped strings inside
   a value tree. Handy for Postgres `jsonb` columns that may arrive
-  pre-decoded or as raw JSON depending on the driver.
-- **Convenience extensions** — `Function.tryCall` (safe `Function.apply`),
-  `Iterable<Enum>.valueOf` (case-insensitive enum lookup), and `FutureOrExt`
-  (`isFuture`, `withMinDuration`, etc.).
+  pre-decoded or as raw JSON depending on the driver. Bounded by a
+  `maxDepth` parameter (default `64`) so hostile or pathological nesting
+  can't overflow the stack.
+- **Convenience extensions** — `Function.tryCall` (safe `Function.apply`,
+  but it deliberately does **not** swallow `Error` subtypes like
+  `StackOverflowError` or `AssertionError`), `Iterable<Enum>.valueOf`
+  (case-insensitive enum lookup), and `FutureOrExt` (`isFuture`,
+  `withMinDuration`, etc.).
 
 ## Installation
 
@@ -68,36 +82,83 @@ void main() async {
     (a, b, c) => '$a $b $c',
   );
   print(greeting); // hello 42 world
+
+  // Deferred batch of operations via Waiter — `addFn` is the
+  // closure-friendly shortcut; `add(WaiterOperation(...))` is the
+  // isolate-portable form.
+  final waiter = Waiter<String>()
+    ..addFn(() => 'sync result', id: 'a')
+    ..addFn(() async => 'async result', id: 'b');
+  final results = await waiter.wait();
+  print(results); // (sync result, async result)
 }
 ```
 
-## Testing
+### `WaiterOperation` — cross-isolate friendly
 
-```sh
-dart test
+`Waiter` stores its queue as immutable `WaiterOperation<T>` value objects.
+Each carries a `run` function plus an optional `id` for auditing / logging.
+When `run` is a top-level or `static` function, the operation (and a list of
+them) is safely sendable across an `Isolate` boundary:
+
+```dart
+int heavyTask() { /* ... */ }
+
+await Isolate.run(() async {
+  final w = Waiter<int>(
+    operations: const [
+      WaiterOperation(heavyTask, id: 'compute-1'),
+      WaiterOperation(heavyTask, id: 'compute-2'),
+    ],
+  );
+  return (await w.wait()).toList();
+});
 ```
 
-The package is exercised by a per-module test suite (one `*_test.dart`
-file per source file) plus a `hardening_test.dart` of regression cases
-for historic bugs. The orchestration core in `lib/src/future_or/` is
-covered by abuse tests that exercise the sync/async ordering, error
-propagation, and lifecycle-callback contracts.
+Closures (`() => ...`) capture their enclosing isolate and cannot cross a
+`SendPort` — that's a Dart runtime restriction, not something the package
+imposes. The value-object wrapper exists precisely so the choice between
+"sendable" (top-level/static) and "local-only" (closure) is explicit and
+inspectable at call sites.
 
-## Release flow
+## Safety guarantees
 
-This package ships through a two-stage GitHub Actions pipeline. See
-[`.github/_README.md`](.github/_README.md) for the full story.
+- **No silent failures.** Misused calls throw `ArgumentError` in every
+  build mode (no debug-only `assert`s). Coerced-key collisions in maps
+  cause the whole conversion to fail rather than silently overwriting.
+- **The original error always wins.** A buggy `onError` / `onComplete`
+  handler never replaces the underlying incident; its own failure is
+  surfaced via `Zone.handleUncaughtError` so it is still observable but
+  not in the caller's catch block.
+- **Cleanup always runs.** `onComplete` fires on every exit path,
+  including when `onError` itself throws.
+- **No critical-`Error` absorption.** `Function.tryCall` swallows
+  `Exception`, `TypeError`, and `NoSuchMethodError` only — `StackOverflow`,
+  `OutOfMemory`, `AssertionError`, and `StateError` propagate.
+- **Bounded recursion.** `decodeJsonbStrings` enforces a `maxDepth` (default
+  `64`) so hostile input cannot overflow the stack.
+- **No silent saturation of integers.** `letIntOrNull` returns `null`
+  outside the runtime-appropriate safe bound — `±2^63` on the VM, `±2^53`
+  on the JS runtime where `int` is double-backed.
 
-Short version: merge to the `prod` branch and you're done. The workflow
-runs tests, auto-bumps the version (patch by default, or minor/major if
-your commit message says `feat:` / `breaking:` / `feat!:`), updates
-`CHANGELOG.md`, tags, and publishes to pub.dev.
+## Cross-platform and isolate safety
 
-If you want full control over the version and changelog instead of
-letting the workflow decide, bump `pubspec.yaml` yourself and use the
-`/changelog` Claude command at
-[`.claude/commands/changelog.md`](.claude/commands/changelog.md) to draft
-the entry — the workflow will respect your pre-bumped version.
+The library targets the Dart VM, the JS runtime (Flutter web, dart2js,
+dartdevc), and **WebAssembly via `dart compile wasm` / `flutter build web
+--wasm`**. It has no `dart:io` or `dart:isolate` imports under `lib/`, and
+all `lib/` sources are pure Dart with no JS-interop or platform conditional
+imports. A minimal program exercising the public surface bundles to roughly
+100 KB minified via dart2js, or ~85 KB of `.wasm` + ~13 KB of JS glue via
+dart2wasm — both dominated by the SDK runtime rather than this library.
+
+Every top-level binding under `lib/` is `const` or `final` of an immutable
+expression — there is **no shared mutable static state**, so multiple
+isolates can use the package concurrently without interference. A dedicated
+[`test/isolate_safety_test.dart`](test/isolate_safety_test.dart) suite
+proves this end-to-end on the VM by sending `Waiter`s and operations
+through `Isolate.run`.
+
+<!-- END _README_CONTENT -->
 
 ---
 

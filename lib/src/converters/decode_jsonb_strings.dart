@@ -15,6 +15,14 @@ import 'dart:convert' show JsonDecoder;
 
 // ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
 
+/// The default recursion depth for [decodeJsonbStrings].
+///
+/// Chosen to accommodate realistic Postgres `jsonb` payloads with comfortable
+/// headroom while still keeping the worst-case stack/heap footprint bounded.
+/// Inputs nested deeper than this are returned unchanged from the point at
+/// which the budget is exhausted, rather than risking a stack overflow.
+const int defaultDecodeJsonbStringsMaxDepth = 64;
+
 /// Recursively walks [input] and decodes any [String] value that begins with
 /// `{` or `[` as JSON, replacing it with the decoded [Map] or [List].
 ///
@@ -26,7 +34,24 @@ import 'dart:convert' show JsonDecoder;
 ///
 /// Strings that do not start with `{` / `[` (after trimming), or that fail to
 /// parse, are returned unchanged — so non-jsonb text columns are unaffected.
-dynamic decodeJsonbStrings(dynamic input) {
+///
+/// [maxDepth] caps the recursion. Defaults to
+/// [defaultDecodeJsonbStringsMaxDepth]; once exhausted, the function stops
+/// recursing and returns the partially-decoded value at that node. This
+/// prevents a hostile or pathologically nested payload from overflowing the
+/// stack — a real concern when consuming `jsonb` from upstream systems.
+dynamic decodeJsonbStrings(
+  dynamic input, {
+  int maxDepth = defaultDecodeJsonbStringsMaxDepth,
+}) {
+  if (maxDepth < 0) {
+    throw ArgumentError.value(maxDepth, 'maxDepth', 'must be non-negative');
+  }
+  return _decodeJsonbStrings(input, maxDepth);
+}
+
+dynamic _decodeJsonbStrings(dynamic input, int depth) {
+  if (depth <= 0) return input;
   if (input is String) {
     final trimmed = input.trim();
     if (trimmed.isEmpty) return input;
@@ -35,21 +60,21 @@ dynamic decodeJsonbStrings(dynamic input) {
     if (first != 0x7B && first != 0x5B) return input;
     try {
       final decoded = const JsonDecoder().convert(trimmed);
-      return decodeJsonbStrings(decoded);
+      return _decodeJsonbStrings(decoded, depth - 1);
     } catch (_) {
       return input;
     }
   }
   if (input is Map) {
     return input.map(
-      (k, v) => MapEntry(k, decodeJsonbStrings(v)),
+      (k, v) => MapEntry(k, _decodeJsonbStrings(v, depth - 1)),
     );
   }
   if (input is List) {
-    return input.map(decodeJsonbStrings).toList();
+    return input.map((e) => _decodeJsonbStrings(e, depth - 1)).toList();
   }
   if (input is Iterable) {
-    return input.map(decodeJsonbStrings).toList();
+    return input.map((e) => _decodeJsonbStrings(e, depth - 1)).toList();
   }
   return input;
 }

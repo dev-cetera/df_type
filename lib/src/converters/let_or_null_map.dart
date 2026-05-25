@@ -46,12 +46,19 @@ Map<K, V>? letMapOrNull<K, V>(dynamic input) {
 // ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
 
 Map<K, V>? _convertMapOrNull<K, V>(Map<dynamic, dynamic> map) {
+  final keyNullable = isNullable<K>();
+  final valueNullable = isNullable<V>();
   final buffer = <K, V>{};
   for (final entry in map.entries) {
     final convertedKey = letOrNull<K>(entry.key);
     final convertedValue = letOrNull<V>(entry.value);
-    if (!isNullable<K>() && convertedKey == null) return null;
-    if (!isNullable<V>() && convertedValue == null) return null;
+    if (!keyNullable && convertedKey == null) return null;
+    if (!valueNullable && convertedValue == null) return null;
+    // Reject duplicate keys after coercion. For instance,
+    // `{1: 'a', '1': 'b'}` with K=int both project to the key `1` — silently
+    // letting the second entry overwrite the first is indistinguishable from
+    // a successful conversion, which is unsafe for life-critical data.
+    if (buffer.containsKey(convertedKey)) return null;
     buffer[convertedKey as K] = convertedValue as V;
   }
   return buffer;

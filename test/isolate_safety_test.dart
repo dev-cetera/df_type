@@ -48,14 +48,18 @@ void main() {
     test('isJsRuntime is computed per-isolate and is consistent', () async {
       final hostValue = isJsRuntime;
       final workerValue = await Isolate.run(() => isJsRuntime);
-      expect(workerValue, hostValue,
-          reason: 'isJsRuntime is a function of the runtime, not isolate '
-              'identity — both must agree',);
+      expect(
+        workerValue,
+        hostValue,
+        reason: 'isJsRuntime is a function of the runtime, not isolate '
+            'identity — both must agree',
+      );
       // And on the VM, both must be false.
       expect(hostValue, isFalse);
     });
 
-    test('letIntOrNull is pure — concurrent calls in different isolates '
+    test(
+        'letIntOrNull is pure — concurrent calls in different isolates '
         'cannot interfere', () async {
       // Fire off four isolates that all hammer the same converter with
       // different inputs. Any cross-isolate state corruption would cause
@@ -101,7 +105,8 @@ void main() {
       expect(received, ['alpha', 'beta']);
     });
 
-    test('a Waiter built in a worker isolate produces results identical to '
+    test(
+        'a Waiter built in a worker isolate produces results identical to '
         'the host-side equivalent', () async {
       // Sanity: same operations, run host-side vs worker-side, identical
       // results. Establishes that nothing about the Waiter pipeline
@@ -125,7 +130,8 @@ void main() {
       expect(workerResults, hostResults);
     });
 
-    test('compute-heavy work can be dispatched to a worker isolate via the '
+    test(
+        'compute-heavy work can be dispatched to a worker isolate via the '
         'value-object form', () async {
       // The whole point of the WaiterOperation pattern: heavy lifting can
       // run off the main isolate so the UI / control loop stays responsive.
@@ -137,7 +143,8 @@ void main() {
   });
 
   group('Closure-based operations stay where they were built', () {
-    test('a closure-based WaiterOperation throws when forced through a '
+    test(
+        'a closure-based WaiterOperation throws when forced through a '
         'SendPort — this is the Dart runtime guard, not ours, but it is '
         'the reason WaiterOperation exists', () async {
       // We construct an op that captures a local variable — a closure.

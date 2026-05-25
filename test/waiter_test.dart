@@ -100,8 +100,11 @@ void main() {
       final w = Waiter<int>()..addFn(() => 1);
       final snapshot = w.operations;
       w.addFn(() => 2);
-      expect(snapshot, hasLength(1),
-          reason: 'snapshot must be a frozen copy, not a live view',);
+      expect(
+        snapshot,
+        hasLength(1),
+        reason: 'snapshot must be a frozen copy, not a live view',
+      );
       expect(w.operations, hasLength(2));
     });
   });
@@ -232,8 +235,11 @@ void main() {
       final a = WaiterOperation<int>(() => 1, id: 'x');
       final b = WaiterOperation<int>(() => 1, id: 'x');
       expect(identical(a, b), isFalse);
-      expect(a == b, isFalse,
-          reason: 'identity, not field-equality, was the historical contract',);
+      expect(
+        a == b,
+        isFalse,
+        reason: 'identity, not field-equality, was the historical contract',
+      );
     });
 
     test('a Waiter built from existing operations preserves them in order', () {

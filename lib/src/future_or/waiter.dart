@@ -55,7 +55,9 @@ class WaiterOperation<T> {
 
   @override
   String toString() {
-    return id == null ? 'WaiterOperation<$T>(unnamed)' : 'WaiterOperation<$T>($id)';
+    return id == null
+        ? 'WaiterOperation<$T>(unnamed)'
+        : 'WaiterOperation<$T>($id)';
   }
 }
 

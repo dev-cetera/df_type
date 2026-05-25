@@ -157,7 +157,8 @@ void main() {
     },
   );
 
-  group('letMapOrNull — coerced-key collisions must be rejected, not silent', () {
+  group('letMapOrNull — coerced-key collisions must be rejected, not silent',
+      () {
     test('{1: "a", "1": "b"} with K=int is rejected because keys collide', () {
       // Both keys project to the int 1 after coercion. A last-write-wins
       // overwrite is silent data loss — for medical records, this must be
@@ -196,7 +197,8 @@ void main() {
       expect(decodeJsonbStrings('{"a":1}', maxDepth: 0), '{"a":1}');
     });
 
-    test('caps recursion — deeper structures stop being decoded once budget '
+    test(
+        'caps recursion — deeper structures stop being decoded once budget '
         'exhausts (no stack overflow)', () {
       // Build a single-string payload representing 100 levels of nesting.
       var s = '"leaf"';
@@ -300,8 +302,11 @@ void main() {
           (e, s) => zoneCapture = e,
         );
         expect(ranCall, isTrue, reason: 'call handler must still run');
-        expect(zoneCapture, isA<ArgumentError>(),
-            reason: 'broken ctor handler must be visible through the zone',);
+        expect(
+          zoneCapture,
+          isA<ArgumentError>(),
+          reason: 'broken ctor handler must be visible through the zone',
+        );
       },
     );
 
@@ -320,8 +325,11 @@ void main() {
         },
         (e, s) {},
       );
-      expect(caught, isA<StateError>(),
-          reason: 'original incident is what the caller must see',);
+      expect(
+        caught,
+        isA<StateError>(),
+        reason: 'original incident is what the caller must see',
+      );
     });
   });
 
@@ -356,8 +364,11 @@ void main() {
       // the latter.
       final result = letIntOrNull('9007199254740993');
       if (isJsRuntime) {
-        expect(result, isNull,
-            reason: 'JS lost precision — must not return a wrong answer',);
+        expect(
+          result,
+          isNull,
+          reason: 'JS lost precision — must not return a wrong answer',
+        );
       } else {
         expect(result, 9007199254740993);
       }
@@ -370,7 +381,8 @@ void main() {
     });
   });
 
-  group('wait.dart — eager-error secondary rejections must NOT leak to Zone', () {
+  group('wait.dart — eager-error secondary rejections must NOT leak to Zone',
+      () {
     test('two rejected Futures: only the first is observable', () async {
       final zoneCaught = <Object>[];
       await runZonedGuarded<Future<void>>(
@@ -396,9 +408,12 @@ void main() {
         },
         (e, s) => zoneCaught.add(e),
       );
-      expect(zoneCaught, isEmpty,
-          reason: 'standard Future.wait leaks here; our custom collector '
-              'must absorb the second rejection',);
+      expect(
+        zoneCaught,
+        isEmpty,
+        reason: 'standard Future.wait leaks here; our custom collector '
+            'must absorb the second rejection',
+      );
     });
 
     test('all three reject — exactly one (the first) is reported', () async {
@@ -432,8 +447,11 @@ void main() {
         (e, s) => zoneCaught.add(e),
       );
       expect(caught, isA<StateError>());
-      expect(zoneCaught, isEmpty,
-          reason: 'B and C must not leak — single attributable failure only',);
+      expect(
+        zoneCaught,
+        isEmpty,
+        reason: 'B and C must not leak — single attributable failure only',
+      );
     });
   });
 
@@ -484,8 +502,11 @@ void main() {
         },
         (e, s) => zoneCapture = e,
       );
-      expect(ranComplete, isTrue,
-          reason: 'cleanup must run even when onError is broken',);
+      expect(
+        ranComplete,
+        isTrue,
+        reason: 'cleanup must run even when onError is broken',
+      );
       expect(zoneCapture, isA<ArgumentError>());
     });
 

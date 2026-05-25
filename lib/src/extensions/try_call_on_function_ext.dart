@@ -61,10 +61,21 @@ extension TryCallOnFunctionExt on Function {
         positionalArguments ?? [],
         namedArguments ?? {},
       ) as T?;
-    } catch (_) {
-      // Catches any exception during invocation (e.g., wrong argument types,
-      // internal errors) and returns null.
+    } on TypeError catch (_) {
+      // Wrong types / return-cast failure → expected absorption.
+      return null;
+    } on NoSuchMethodError catch (_) {
+      // Wrong arity or missing named arg → expected absorption.
+      return null;
+    } on Exception catch (_) {
+      // The callee threw something domain-level (FormatException, etc.) →
+      // expected absorption.
       return null;
     }
+    // Critical `Error` subtypes (StackOverflowError, OutOfMemoryError,
+    // AssertionError, StateError, ...) intentionally fall through. Catching
+    // them would mask program-state corruption that a medical-grade caller
+    // *must* see — silent absorption of those is more dangerous than the
+    // missing convenience.
   }
 }

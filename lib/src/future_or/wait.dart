@@ -13,7 +13,7 @@
 
 // ignore_for_file: require_trailing_commas
 
-import 'dart:async' show FutureOr;
+import 'dart:async' show Completer, FutureOr, Zone;
 
 import 'package:collection/collection.dart';
 
@@ -186,12 +186,47 @@ Future<R> _futureWaitEagerError<R>(
   _TOnErrorCallback? onError,
   _TOnCompleteCallback? onComplete,
 }) {
-  return Future.wait(buffer, eagerError: true)
+  return _eagerCollectFutures(buffer)
       .then((values) => Future.value(callback(values)))
       .catchError(
         (Object e, StackTrace? s) => _handleError<R>(_Error(e, s), onError),
       )
       .whenComplete(onComplete ?? () {});
+}
+
+/// Eager-error variant of [Future.wait] that **absorbs secondary rejections**.
+///
+/// Standard `Future.wait(eagerError: true)` reports the first error to the
+/// caller but lets every subsequent error bubble through
+/// `Zone.current.handleUncaughtError` — polluting the audit log with
+/// follow-up failures that the caller never asked about. For life-critical
+/// code the caller wants a single attributable failure, so we hand-roll the
+/// collector and silently drop rejections that arrive after we've already
+/// completed in error.
+Future<List<dynamic>> _eagerCollectFutures(Iterable<Future<dynamic>> futures) {
+  final list = futures is List<Future<dynamic>>
+      ? futures
+      : futures.toList(growable: false);
+  if (list.isEmpty) return Future<List<dynamic>>.value(<dynamic>[]);
+  final completer = Completer<List<dynamic>>();
+  final results = List<dynamic>.filled(list.length, null, growable: false);
+  var remaining = list.length;
+  for (var i = 0; i < list.length; i++) {
+    final idx = i;
+    list[i].then<void>(
+      (Object? v) {
+        if (completer.isCompleted) return;
+        results[idx] = v;
+        remaining--;
+        if (remaining == 0) completer.complete(results);
+      },
+      onError: (Object e, StackTrace? s) {
+        if (completer.isCompleted) return;
+        completer.completeError(e, s ?? StackTrace.current);
+      },
+    ).ignore();
+  }
+  return completer.future;
 }
 
 Future<R> _futureWait<R>(
@@ -227,39 +262,83 @@ Future<R> _processItems<R>(
   return Future.value(callback(valusAndErrors.where((e) => e is! _Error)));
 }
 
+/// Invokes the error handler with the original error and rethrows the
+/// **original** error after it settles.
+///
+/// Medical-grade invariant: a bug inside the handler must never substitute
+/// itself for the underlying incident. If the handler throws synchronously
+/// or rejects asynchronously, that failure is surfaced through
+/// `Zone.current.handleUncaughtError` (so it is still observable) but the
+/// original error is what propagates to the caller.
 FutureOr<R> _handleError<R>(_Error error, _TOnErrorCallback? onError) {
+  if (onError == null) {
+    _throwError(error.e, error.s);
+  }
   FutureOr<void>? errorResult;
   try {
-    errorResult = onError?.call(error.e, error.s);
-  } catch (e, s) {
-    _throwError(e, s);
+    errorResult = onError(error.e, error.s);
+  } catch (handlerError, handlerStack) {
+    Zone.current.handleUncaughtError(handlerError, handlerStack);
   }
   if (errorResult is Future<void>) {
-    return Future.value(errorResult).then((_) => _throwError(error.e, error.s));
+    return errorResult.then<void>(
+      (_) {},
+      onError: (Object e, StackTrace? s) {
+        Zone.current.handleUncaughtError(e, s ?? StackTrace.current);
+      },
+    ).then((_) => _throwError(error.e, error.s));
   }
   _throwError(error.e, error.s);
 }
 
+/// As [_handleError], but also runs [onComplete] on every exit path —
+/// including when [onError] itself throws.
+///
+/// Medical-grade invariant: `onComplete` is the cleanup hook (closing
+/// streams, releasing locks, flushing audit logs) and **must** run, even if
+/// the error handler is broken.
 FutureOr<R> _handleErrorAndComplete<R>(
   _Error error,
   _TOnErrorCallback? onError,
   _TOnCompleteCallback? onComplete,
 ) {
   FutureOr<void>? errorResult;
+  if (onError != null) {
+    try {
+      errorResult = onError(error.e, error.s);
+    } catch (handlerError, handlerStack) {
+      Zone.current.handleUncaughtError(handlerError, handlerStack);
+    }
+  }
   FutureOr<void>? onCompleteResult;
-  try {
-    errorResult = onError?.call(error.e, error.s);
-    onCompleteResult = onComplete?.call();
-  } catch (e, s) {
-    _throwError(e, s);
+  if (onComplete != null) {
+    try {
+      onCompleteResult = onComplete();
+    } catch (completeError, completeStack) {
+      Zone.current.handleUncaughtError(completeError, completeStack);
+    }
   }
-  if (errorResult is Future<void> || onCompleteResult is Future<void>) {
-    return Future.wait([
-      Future.value(errorResult),
-      Future.value(onCompleteResult),
-    ]).then((_) => _throwError(error.e, error.s));
+  final hasAsync =
+      errorResult is Future<void> || onCompleteResult is Future<void>;
+  if (!hasAsync) {
+    _throwError(error.e, error.s);
   }
-  _throwError(error.e, error.s);
+  return Future.wait<void>([
+    if (errorResult is Future<void>)
+      errorResult.then<void>(
+        (_) {},
+        onError: (Object e, StackTrace? s) {
+          Zone.current.handleUncaughtError(e, s ?? StackTrace.current);
+        },
+      ),
+    if (onCompleteResult is Future<void>)
+      onCompleteResult.then<void>(
+        (_) {},
+        onError: (Object e, StackTrace? s) {
+          Zone.current.handleUncaughtError(e, s ?? StackTrace.current);
+        },
+      ),
+  ]).then((_) => _throwError(error.e, error.s));
 }
 
 Never _throwError(Object error, [StackTrace? stackTrace]) {

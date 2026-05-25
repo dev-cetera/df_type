@@ -1,16 +1,3 @@
-##.title
-## ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-##
-## Copyright © dev-cetera.com & contributors.
-##
-## The use of this source code is governed by an MIT-style license described in
-## the LICENSE file located in this project's root directory.
-##
-## See: https://opensource.org/license/mit
-##
-## ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-##.title~
-
 # Push to `prod` -> tests run -> version is bumped automatically -> tag is
 # pushed -> publish.yml ships to pub.dev.
 #
@@ -86,10 +73,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0  # Full history + tags for accurate bump decisions
           ref: prod
+          # PAT (not GITHUB_TOKEN) so the tag push at the end of this job
+          # is attributed to a real account and triggers publish.yml.
+          # GitHub blocks workflow_run cascades from GITHUB_TOKEN.
+          token: ${{ secrets.RELEASE_PAT }}
 
       - name: Set up Dart
         uses: dart-lang/setup-dart@v1
@@ -98,7 +89,20 @@ jobs:
         run: dart pub get
 
       - name: Verify formatter
-        run: dart format --output=none --set-exit-if-changed .
+        # Scope to this package's own primary source. Avoids walking into
+        # sub-projects (example/, smoke_test/) that carry their own pubspec
+        # but aren't `pub get`-ed in CI — formatting them with no package
+        # config triggers a language-version fallback and spurious diffs.
+        run: |
+          DIRS=""
+          for d in lib test bin; do
+            [ -d "$d" ] && DIRS="$DIRS $d"
+          done
+          if [ -z "$DIRS" ]; then
+            echo "No primary source directories to format."
+            exit 0
+          fi
+          dart format --output=none --set-exit-if-changed $DIRS
 
       - name: Static analysis
         run: dart analyze --fatal-infos

@@ -48,11 +48,12 @@ void main() {
       expect(letAsStringOrNull(' hello '), ' hello '); // no trimming
     });
 
-    test('null input — Dart prints "null"', () {
-      // `null.toString()` in Dart is the string "null"; the converter does
-      // not special-case this. Documented to confirm the behaviour stays
-      // intentional rather than accidental.
-      expect(letAsStringOrNull(null), 'null');
+    test('null input returns null (not the string "null")', () {
+      // Earlier revisions of this helper let `null.toString()` through,
+      // producing the literal four-character string 'null'. That sentinel
+      // leaking into a medical record is unacceptable, so the helper now
+      // null-guards explicitly.
+      expect(letAsStringOrNull(null), isNull);
     });
 
     test('survives a throwing toString', () {
@@ -249,16 +250,23 @@ void main() {
       expect(letOrNull<String>(true), 'true');
     });
 
-    test('asserts when given a specific collection subtype', () {
-      // Per the assert, `letOrNull<List<int>>` is rejected — specific element
-      // types are not safe to construct, only `List<dynamic>` is.
-      expect(() => letOrNull<List<int>>([1, 2, 3]),
-          throwsA(isA<AssertionError>()),);
+    test('rejects specific collection subtypes with ArgumentError', () {
+      // Previously this was guarded by an `assert`, which is stripped in
+      // release mode — the function then silently returned null on the same
+      // misuse. For medical-grade callers, that silent failure is not
+      // acceptable, so the guard is now an explicit `throw ArgumentError`
+      // that fires in every build mode.
       expect(
-          () => letOrNull<Set<int>>(<int>{1}), throwsA(isA<AssertionError>()),);
+        () => letOrNull<List<int>>([1, 2, 3]),
+        throwsA(isA<ArgumentError>()),
+      );
+      expect(
+        () => letOrNull<Set<int>>(<int>{1}),
+        throwsA(isA<ArgumentError>()),
+      );
       expect(
         () => letOrNull<Map<String, int>>(<String, int>{'a': 1}),
-        throwsA(isA<AssertionError>()),
+        throwsA(isA<ArgumentError>()),
       );
     });
 

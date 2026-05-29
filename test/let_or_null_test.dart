@@ -163,9 +163,14 @@ void main() {
       expect(letBoolOrNull('False'), isFalse);
     });
 
-    test('rejects 1/0 and yes/no — only literal true/false', () {
-      expect(letBoolOrNull(1), isNull);
-      expect(letBoolOrNull(0), isNull);
+    test('accepts int 0/1 — for SQLite INTEGER-backed bools', () {
+      expect(letBoolOrNull(1), isTrue);
+      expect(letBoolOrNull(0), isFalse);
+    });
+
+    test('rejects other ints and yes/no strings', () {
+      expect(letBoolOrNull(2), isNull);
+      expect(letBoolOrNull(-1), isNull);
       expect(letBoolOrNull('yes'), isNull);
       expect(letBoolOrNull('no'), isNull);
     });

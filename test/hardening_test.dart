@@ -121,7 +121,15 @@ void main() {
       expect(letBoolOrNull('FALSE'), false);
       expect(letBoolOrNull(' True '), true);
       expect(letBoolOrNull('yes'), isNull);
-      expect(letBoolOrNull(1), isNull);
+    });
+    test(
+        'letBoolOrNull maps int 0/1 to false/true (SQLite INTEGER bool '
+        'compat)', () {
+      expect(letBoolOrNull(1), true);
+      expect(letBoolOrNull(0), false);
+      // Other ints still reject — only 0/1 are meaningful here.
+      expect(letBoolOrNull(2), isNull);
+      expect(letBoolOrNull(-1), isNull);
     });
     test('letDoubleOrNull preserves NaN/Infinity (not int conversion)', () {
       expect(letDoubleOrNull('NaN')?.isNaN, isTrue);

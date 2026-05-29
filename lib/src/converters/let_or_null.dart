@@ -223,14 +223,24 @@ double? letDoubleOrNull(dynamic input) => letNumOrNull(input)?.toDouble();
 
 /// Converts [input] to [bool], returning [Null] on failure.
 ///
+/// `int 0`/`int 1` map to `false`/`true` to interoperate with SQLite (and
+/// other drivers) that store booleans as INTEGER. Any other integer value
+/// returns null rather than collapsing — `bool(2)` is not a meaningful
+/// truthiness anywhere in this codebase.
+///
 /// Supported types:
 ///
 /// - [String]
 /// - [bool]
+/// - [int] (0 or 1 only)
 bool? letBoolOrNull(dynamic input) {
   if (input is bool) return input;
   if (input is String) {
     return bool.tryParse(input.trim(), caseSensitive: false);
+  }
+  if (input is int) {
+    if (input == 1) return true;
+    if (input == 0) return false;
   }
   return null;
 }

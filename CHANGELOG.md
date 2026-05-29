@@ -1,5 +1,8 @@
 # Changelog
 
+## [0.16.1]
+
+- feat: `letBoolOrNull` accepts `int 0`/`int 1` as `false`/`true` for interop with SQLite (and other drivers) that store booleans as INTEGER. Other integer values still return `null`.
 
 ## [0.16.0]
 

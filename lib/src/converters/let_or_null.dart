@@ -44,7 +44,7 @@ const double vmInt64Bound = 9223372036854775808.0;
 /// This is a high-level dispatcher that uses more specific `let...OrNull`
 /// helpers based on the target type [T].
 ///
-/// Supported types:
+/// Supported types (each also in its nullable form, e.g. `int?`):
 ///
 /// - [bool]
 /// - [num]
@@ -57,27 +57,47 @@ const double vmInt64Bound = 9223372036854775808.0;
 /// - [List]  (dynamic)
 /// - [Set] (dynamic)
 /// - [Map] (dynamic, dynamic)
+///
+/// If [input] already is a [T], it is returned unchanged, whatever [T] is.
+/// A `null` [input] returns `null`.
+///
+/// Throws [ArgumentError] when [input] would need converting into a type this
+/// dispatcher cannot produce, rather than returning a `null` that looks like
+/// an ordinary conversion failure:
+///
+/// - **Specific collection types** such as `List<int>` or
+///   `Map<String, int>`. Use [letListOrNull], [letSetOrNull],
+///   [letIterableOrNull] or [letMapOrNull] with the element types instead.
+/// - **Enums.** An enum value cannot be found from the type alone. Look it up
+///   by name with `MyEnum.values.valueOf(...)` (returns `null` on a miss) or
+///   `MyEnum.values.valueOfOrThrow(...)`.
 T? letOrNull<T>(dynamic input) {
-  // Enforced in release as well: a stripped assert would let a misuse like
-  // `letOrNull<List<int>>(...)` silently return null, which is
-  // indistinguishable from a real conversion failure. For medical-grade
-  // code that's an unacceptable silent failure.
-  if ((isSubtype<T, List<dynamic>>() && !isSubtype<List<dynamic>, T>()) ||
-      (isSubtype<T, Set<dynamic>>() && !isSubtype<Set<dynamic>, T>()) ||
-      (isSubtype<T, Iterable<dynamic>>() &&
-          !isSubtype<Iterable<dynamic>, T>()) ||
-      (isSubtype<T, Map<dynamic, dynamic>>() &&
-          !isSubtype<Map<dynamic, dynamic>, T>())) {
-    throw ArgumentError(
-      'letOrNull<$T> cannot be used with specific collection types due to '
-      'type safety. Only the broadest collection types '
-      '(Iterable<dynamic>, Map<dynamic, dynamic>) are supported.',
-    );
-  }
   if (input is T) return input;
   if (input == null) return null;
+  // Enforced in release as well: a stripped assert would let a misuse like
+  // `letOrNull<List<int>>('[1]')` silently return null, which is
+  // indistinguishable from a real conversion failure. For medical-grade
+  // code that's an unacceptable silent failure.
+  if (_isSpecificCollectionType<T>()) {
+    throw ArgumentError(
+      'letOrNull<$T> cannot convert a ${input.runtimeType} into a specific '
+      'collection type. Only List<dynamic>, Set<dynamic>, Iterable<dynamic> '
+      'and Map<dynamic, dynamic> (or their nullable forms) are converted; use '
+      'letListOrNull, letSetOrNull, letIterableOrNull or letMapOrNull with '
+      'the element types instead.',
+    );
+  }
+  if (_isEnumType<T>()) {
+    throw ArgumentError(
+      'letOrNull<$T> cannot convert a ${input.runtimeType} into an enum. '
+      'Look the value up by name with $T.values.valueOf(...) or '
+      '$T.values.valueOfOrThrow(...) instead.',
+    );
+  }
   final raw = () {
-    if (typeEquality<T, double>() || typeEquality<T, double?>()) {
+    if (typeEquality<T, num>() || typeEquality<T, num?>()) {
+      return letNumOrNull(input);
+    } else if (typeEquality<T, double>() || typeEquality<T, double?>()) {
       return letDoubleOrNull(input);
     } else if (typeEquality<T, int>() || typeEquality<T, int?>()) {
       return letIntOrNull(input);
@@ -87,13 +107,13 @@ T? letOrNull<T>(dynamic input) {
       return letDateTimeOrNull(input);
     } else if (typeEquality<T, Uri>() || typeEquality<T, Uri?>()) {
       return letUriOrNull(input);
-    } else if (isSubtype<T, List<dynamic>>()) {
+    } else if (isSubtype<T, List<dynamic>?>()) {
       return letListOrNull<dynamic>(input);
-    } else if (isSubtype<T, Set<dynamic>>()) {
+    } else if (isSubtype<T, Set<dynamic>?>()) {
       return letSetOrNull<dynamic>(input);
-    } else if (isSubtype<T, Iterable<dynamic>>()) {
+    } else if (isSubtype<T, Iterable<dynamic>?>()) {
       return letIterableOrNull<dynamic>(input);
-    } else if (isSubtype<T, Map<dynamic, dynamic>>()) {
+    } else if (isSubtype<T, Map<dynamic, dynamic>?>()) {
       return letMapOrNull<dynamic, dynamic>(input);
     } else if (typeEquality<T, String>() || typeEquality<T, String?>()) {
       return letAsStringOrNull(input);
@@ -103,6 +123,32 @@ T? letOrNull<T>(dynamic input) {
 
   return letAsOrNull<T>(raw);
 }
+
+/// True when [T] is `Null` or `Never`. Those are subtypes of every nullable
+/// type, so the guards below must not mistake them for collections or enums.
+bool _isBottomType<T>() => isSubtype<T, Null>();
+
+/// True when [T] is exactly [TBroad] or its nullable form (`List<dynamic>`
+/// or `List<dynamic>?`, say), as opposed to a narrower type like `List<int>`.
+bool _isBroadType<T, TBroad>() =>
+    isSubtype<T, TBroad?>() && isSubtype<TBroad, T>();
+
+/// True when [T] is a collection type narrower than the broad ones
+/// [letOrNull] can produce, e.g. `List<int>` or `Map<String, int>?`.
+bool _isSpecificCollectionType<T>() {
+  if (_isBottomType<T>()) return false;
+  final isCollection = isSubtype<T, Iterable<dynamic>?>() ||
+      isSubtype<T, Map<dynamic, dynamic>?>();
+  if (!isCollection) return false;
+  final isBroad = _isBroadType<T, List<dynamic>>() ||
+      _isBroadType<T, Set<dynamic>>() ||
+      _isBroadType<T, Iterable<dynamic>>() ||
+      _isBroadType<T, Map<dynamic, dynamic>>();
+  return !isBroad;
+}
+
+/// True when [T] is an enum type (or its nullable form).
+bool _isEnumType<T>() => !_isBottomType<T>() && isSubtype<T, Enum?>();
 
 /// Casts [input] to type [T], returning [Null] on failure.
 ///

@@ -255,36 +255,118 @@ void main() {
       expect(letOrNull<String>(true), 'true');
     });
 
-    test('rejects specific collection subtypes with ArgumentError', () {
+    test('rejects a conversion into a specific collection subtype', () {
       // Previously this was guarded by an `assert`, which is stripped in
       // release mode — the function then silently returned null on the same
       // misuse. For medical-grade callers, that silent failure is not
-      // acceptable, so the guard is now an explicit `throw ArgumentError`
-      // that fires in every build mode.
+      // acceptable, so the guard is an explicit `throw ArgumentError` that
+      // fires in every build mode.
       expect(
-        () => letOrNull<List<int>>([1, 2, 3]),
+        () => letOrNull<List<int>>('[1,2,3]'),
         throwsA(isA<ArgumentError>()),
       );
       expect(
-        () => letOrNull<Set<int>>(<int>{1}),
+        () => letOrNull<Set<int>>(<dynamic>[1]),
         throwsA(isA<ArgumentError>()),
       );
       expect(
-        () => letOrNull<Map<String, int>>(<String, int>{'a': 1}),
+        () => letOrNull<Map<String, int>>('{"a":1}'),
+        throwsA(isA<ArgumentError>()),
+      );
+      expect(
+        () => letOrNull<List<int>?>('[1,2,3]'),
         throwsA(isA<ArgumentError>()),
       );
     });
 
+    test(
+        'a specific collection subtype passes through when input already is '
+        'that type', () {
+      // Nothing needs converting, so there is nothing unsafe to reject.
+      expect(letOrNull<List<int>>([1, 2, 3]), [1, 2, 3]);
+      expect(letOrNull<Set<int>>(<int>{1}), {1});
+      expect(
+        letOrNull<Map<String, int>>(<String, int>{'a': 1}),
+        {'a': 1},
+      );
+    });
+
+    test('null input on a specific collection subtype returns null', () {
+      expect(letOrNull<List<int>>(null), isNull);
+      expect(letOrNull<Map<String, int>?>(null), isNull);
+    });
+
     test('accepts the absolute-top generic collection types', () {
-      // The assert in letOrNull is strict — even `List<dynamic>` is rejected
-      // because List<dynamic> is itself a strict subtype of Iterable<dynamic>.
-      // Only the broadest types (`Iterable<dynamic>` and `Map<dynamic, dynamic>`)
-      // pass the assertion.
       expect(letOrNull<Iterable<dynamic>>('[1,2,3]')?.toList(), [1, 2, 3]);
       expect(letOrNull<Map<dynamic, dynamic>>('{"a":1}'), {'a': 1});
     });
+
+    test('List<dynamic> and Set<dynamic> are supported, not rejected', () {
+      expect(letOrNull<List<dynamic>>([1, 2]), [1, 2]);
+      expect(letOrNull<List<dynamic>>('[1,2]'), [1, 2]);
+      expect(letOrNull<List<dynamic>>(<dynamic>{1, 2}), [1, 2]);
+      expect(letOrNull<Set<dynamic>>(<dynamic>{1, 2}), {1, 2});
+      expect(letOrNull<Set<dynamic>>('[1,2,2]'), {1, 2});
+      expect(letOrNull<Set<dynamic>>([1, 2, 2]), {1, 2});
+    });
+
+    test('nullable broad collection types convert, not silently null', () {
+      expect(letOrNull<List<dynamic>?>('[1,2]'), [1, 2]);
+      expect(letOrNull<Set<dynamic>?>('[1,2]'), {1, 2});
+      expect(letOrNull<Iterable<dynamic>?>('[1,2]')?.toList(), [1, 2]);
+      expect(letOrNull<Map<dynamic, dynamic>?>('{"a":1}'), {'a': 1});
+      expect(letOrNull<List<dynamic>?>(null), isNull);
+    });
+
+    test('collection converters nest through letOrNull', () {
+      expect(
+        letMapOrNull<String, List<dynamic>>({
+          'a': [1],
+        }),
+        {
+          'a': [1],
+        },
+      );
+      expect(
+        letMapOrNull<String, List<dynamic>>('{"a":[1]}'),
+        {
+          'a': [1],
+        },
+      );
+      expect(letListOrNull<Map<String, dynamic>>('[{}]'), [
+        <String, dynamic>{},
+      ]);
+      expect(letListOrNull<List<dynamic>>('[[1],[2]]'), [
+        [1],
+        [2],
+      ]);
+    });
+
+    test('dispatches num through letNumOrNull', () {
+      expect(letOrNull<num>('5'), 5);
+      expect(letOrNull<num>(' 2.5 '), 2.5);
+      expect(letOrNull<num?>('5'), 5);
+      expect(letOrNull<num>(7), 7);
+      expect(letOrNull<num>('abc'), isNull);
+    });
+
+    test('rejects enum targets loudly (enums go through valueOf)', () {
+      expect(letOrNull<_Colour>(_Colour.red), _Colour.red);
+      expect(letOrNull<_Colour?>(null), isNull);
+      expect(letOrNull<_Colour>(null), isNull);
+      expect(
+        () => letOrNull<_Colour>('red'),
+        throwsA(isA<ArgumentError>()),
+      );
+      expect(
+        () => letOrNull<_Colour?>('red'),
+        throwsA(isA<ArgumentError>()),
+      );
+    });
   });
 }
+
+enum _Colour { red }
 
 // ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
 

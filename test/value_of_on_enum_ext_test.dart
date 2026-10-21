@@ -48,6 +48,47 @@ void main() {
     });
   });
 
+  group('valueOfOrThrow — strict lookup', () {
+    test('matches like valueOf (case-insensitive, trimmed)', () {
+      expect(_Status.values.valueOfOrThrow('pending'), _Status.pending);
+      expect(_Status.values.valueOfOrThrow('ACTIVE'), _Status.active);
+      expect(_Status.values.valueOfOrThrow('  Done '), _Status.done);
+    });
+
+    test('unknown name throws ArgumentError naming the value and options', () {
+      expect(
+        () => _Status.values.valueOfOrThrow('archived'),
+        throwsA(
+          isA<ArgumentError>()
+              .having((e) => e.toString(), 'message', contains('archived'))
+              .having(
+                (e) => e.toString(),
+                'message',
+                contains('pending, active, done'),
+              ),
+        ),
+      );
+    });
+
+    test('null and empty input throw', () {
+      expect(
+        () => _Status.values.valueOfOrThrow(null),
+        throwsA(isA<ArgumentError>()),
+      );
+      expect(
+        () => _Status.values.valueOfOrThrow('  '),
+        throwsA(isA<ArgumentError>()),
+      );
+    });
+
+    test('the receiver is the lookup set', () {
+      expect(
+        () => [_Status.pending].valueOfOrThrow('done'),
+        throwsA(isA<ArgumentError>()),
+      );
+    });
+  });
+
   group('valueOf — restricted sublists', () {
     test('the receiver is the lookup set, not the whole enum', () {
       // Calling `valueOf` on a sublist that excludes `done` must not find it.

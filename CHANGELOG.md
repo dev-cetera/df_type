@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.16.2]
+
+- fix: `letOrNull<List<dynamic>>` and `letOrNull<Set<dynamic>>` (and their nullable forms) no longer throw `ArgumentError`; they convert like `Iterable<dynamic>`. Nested conversions such as `letMapOrNull<String, List<dynamic>>(...)` and `letListOrNull<Map<String, dynamic>>(...)` work again.
+- fix: nullable collection targets (`letOrNull<List<dynamic>?>('[1,2]')`, `Map<dynamic, dynamic>?`, …) now convert instead of returning `null`.
+- fix: `letOrNull` returns an input that already is `T` unchanged for any `T`, including specific collection types (`letOrNull<List<int>>(<int>[1])`), and returns `null` for a `null` input. It still throws `ArgumentError` when the input would need converting into a specific collection type.
+- feat: `letOrNull<num>` dispatches through `letNumOrNull` (`letOrNull<num>('5')` is `5`; it used to be `null`).
+- feat: `letOrNull` throws `ArgumentError` when asked to convert a non-enum input into an enum type, instead of silently returning `null`; look enums up with `valueOf` / `valueOfOrThrow`.
+- feat: Add `Iterable<Enum>.valueOfOrThrow` — the strict sibling of `valueOf` (same case-insensitive, trimmed matching) that throws `ArgumentError` naming the unknown value and the valid names.
+
 ## [0.16.1]
 
 - feat: `letBoolOrNull` accepts `int 0`/`int 1` as `false`/`true` for interop with SQLite (and other drivers) that store booleans as INTEGER. Other integer values still return `null`.

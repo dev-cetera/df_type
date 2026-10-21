@@ -41,4 +41,34 @@ extension ValueOfOnEnumExt<T extends Enum> on Iterable<T> {
       (type) => type.name.toLowerCase() == value?.toLowerCase().trim(),
     );
   }
+
+  /// Like [valueOf], but throws instead of returning `null` when [value] is
+  /// `null` or matches no enum value in this iterable.
+  ///
+  /// Matching is the same as [valueOf]: case-insensitive, with surrounding
+  /// whitespace trimmed.
+  ///
+  /// Throws an [ArgumentError] naming [value] and the names it was compared
+  /// against.
+  ///
+  /// {@tool snippet}
+  /// ```dart
+  /// enum Status { pending, active, done }
+  ///
+  /// void main() {
+  ///   print(Status.values.valueOfOrThrow('ACTIVE')); // Status.active
+  ///   Status.values.valueOfOrThrow('archived'); // throws ArgumentError
+  /// }
+  /// ```
+  /// {@end-tool}
+  T valueOfOrThrow(String? value) {
+    final match = valueOf(value);
+    if (match != null) return match;
+    final names = map((type) => type.name).join(', ');
+    throw ArgumentError.value(
+      value,
+      'value',
+      'No enum value matches (case-insensitive) among [$names]',
+    );
+  }
 }

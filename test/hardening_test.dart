@@ -148,13 +148,13 @@ void main() {
     () {
       test('rejects List<int> with ArgumentError, not silent null', () {
         expect(
-          () => letOrNull<List<int>>([1, 2, 3]),
+          () => letOrNull<List<int>>(<dynamic>[1, 2, 3]),
           throwsA(isA<ArgumentError>()),
         );
       });
       test('rejects Map<String, int> with ArgumentError', () {
         expect(
-          () => letOrNull<Map<String, int>>(<String, int>{'a': 1}),
+          () => letOrNull<Map<String, int>>(<dynamic, dynamic>{'a': 1}),
           throwsA(isA<ArgumentError>()),
         );
       });
